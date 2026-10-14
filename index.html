@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Shield</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout : coque d'application — barre latérale sur ordinateur, barre d'onglets en bas sur téléphone ; indigo (teinture malienne) + or */
+:root{
+  --bg:#F2F3F8; --surface:#FFFFFF; --sunk:#E9EBF3; --ink:#151A34; --muted:#585F7E; --line:#DADDEA;
+  --indigo:#2A3889; --indigo-ink:#FFFFFF; --indigo-soft:#E5E8F7;
+  --gold:#C98612; --gold-soft:#FBF0D9;
+  --good:#17804F; --good-soft:#DFF3E8; --warn:#B26A06; --warn-soft:#FCEBD2; --bad:#BC3328; --bad-soft:#FADFDC;
+  --info:#3D5BB8; --info-soft:#E3E9FA;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1021; --surface:#161A31; --sunk:#1D2240; --ink:#E7E9F6; --muted:#9BA1C0; --line:#2A3053;
+  --indigo:#8E9CF0; --indigo-ink:#0D1021; --indigo-soft:#222A58;
+  --gold:#F0B43F; --gold-soft:#2F2714;
+  --good:#4CC48A; --good-soft:#15301F; --warn:#EBA43C; --warn-soft:#33260F; --bad:#F27A6E; --bad-soft:#3A1A18;
+  --info:#93A8F2; --info-soft:#1F2850; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1021; --surface:#161A31; --sunk:#1D2240; --ink:#E7E9F6; --muted:#9BA1C0; --line:#2A3053;
+  --indigo:#8E9CF0; --indigo-ink:#0D1021; --indigo-soft:#222A58;
+  --gold:#F0B43F; --gold-soft:#2F2714;
+  --good:#4CC48A; --good-soft:#15301F; --warn:#EBA43C; --warn-soft:#33260F; --bad:#F27A6E; --bad-soft:#3A1A18;
+  --info:#93A8F2; --info-soft:#1F2850; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:1.75rem;font-weight:800;line-height:1.15}
+h2{font-size:1.2rem;font-weight:800}
+h3{font-size:1rem;font-weight:600}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+
+/* Coque */
+.shell{display:grid;grid-template-columns:1fr;min-height:100%}
+.side{display:none}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:-.02em}
+.brand svg{width:28px;height:28px;flex:none}
+.plan-chip{font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--gold-soft);color:var(--gold);border:0}
+main{padding:20px 16px 110px;max-width:980px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:24px;min-width:0}
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.navbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:6px 2px;font-size:.72rem;font-weight:600;color:var(--muted);border-radius:10px}
+.navbtn svg{width:22px;height:22px}
+.navbtn[aria-current="page"]{color:var(--indigo)}
+@media (min-width:900px){
+  .shell{grid-template-columns:232px 1fr}
+  .topbar,.bottomnav{display:none}
+  .side{display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;padding:22px 14px;background:var(--surface);border-right:1px solid var(--line)}
+  .side .brand{padding:0 8px 18px}
+  .side .navbtn{flex-direction:row;gap:12px;font-size:.92rem;padding:10px 12px;justify-content:flex-start}
+  .side .navbtn[aria-current="page"]{background:var(--indigo-soft)}
+  .side .plan-box{margin-top:auto;padding:14px;border-radius:12px;background:var(--sunk);display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+  main{padding:32px 32px 48px}
+}
+/* Bande bogolan sous la marque */
+.strip{height:6px;border-radius:3px;background:
+  repeating-linear-gradient(90deg,var(--gold) 0 10px,transparent 10px 14px,var(--indigo) 14px 18px,transparent 18px 22px);opacity:.85}
+
+/* Blocs */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.head>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:700px){.grid2{grid-template-columns:1fr 1fr}}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:10px;font-weight:600;font-size:.88rem}
+.btn:hover{background:var(--sunk)}
+.btn.primary{background:var(--indigo);color:var(--indigo-ink);border-color:var(--indigo)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:6px 10px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{background:none;border:0;padding:0;color:var(--indigo);font-weight:600;font-size:.88rem}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.t-good{background:var(--good-soft);color:var(--good)} .t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-bad{background:var(--bad-soft);color:var(--bad)} .t-info{background:var(--info-soft);color:var(--info)}
+.t-neutral{background:var(--sunk);color:var(--muted)} .t-gold{background:var(--gold-soft);color:var(--gold)}
+.sample{background:var(--gold-soft);color:var(--gold);border-radius:10px;padding:10px 14px;font-size:.85rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+
+/* Jauges */
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ring{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ring svg{width:min(140px,100%);height:auto}
+.ring-bg{fill:none;stroke:var(--sunk);stroke-width:11}
+.ring-fg{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.s-good{stroke:var(--good)} .s-warn{stroke:var(--warn)} .s-bad{stroke:var(--bad)}
+.ring-num{font-family:var(--f-display);font-weight:800;font-size:30px;fill:var(--ink);text-anchor:middle}
+.ring-unit{font-family:var(--f-data);font-size:11px;fill:var(--muted);text-anchor:middle}
+.ring-label{font-weight:600}
+.cross{border-left:4px solid var(--gold);background:var(--gold-soft);border-radius:0 10px 10px 0;padding:12px 14px;font-size:.9rem}
+
+/* Barres catégories */
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px 10px;align-items:center}
+.bar .lbl{font-size:.88rem}
+.bar .track{grid-column:1/-1;height:8px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;border-radius:4px}
+.f-good{background:var(--good)} .f-warn{background:var(--warn)} .f-bad{background:var(--bad)}
+.bar .val{text-align:right;font-size:.85rem}
+
+/* Actions */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;font-size:.8rem;font-weight:600}
+.fbtn[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.actions{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.action{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.action:first-child{border-top:0}
+.stripe{align-self:stretch;border-radius:2px}
+.st-urgent{background:var(--bad)} .st-m1{background:var(--warn)} .st-m3{background:var(--info)}
+.action .body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.action .meta{display:flex;flex-wrap:wrap;gap:6px}
+.action.done .title{text-decoration:line-through;color:var(--muted)}
+.status{border:0;border-radius:99px;padding:6px 11px;font-size:.76rem;font-weight:600;min-width:84px}
+.status.todo{background:var(--sunk);color:var(--muted)} .status.doing{background:var(--info-soft);color:var(--info)} .status.done{background:var(--good-soft);color:var(--good)}
+
+/* Diagnostic */
+.tabs2{display:inline-flex;background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
+.tabs2 button{border:0;background:none;padding:7px 14px;border-radius:8px;font-weight:600;font-size:.85rem;color:var(--muted)}
+.tabs2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .08)}
+.catscroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.catbtn{flex:none;display:flex;flex-direction:column;gap:2px;align-items:flex-start;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;min-width:130px;text-align:left}
+.catbtn[aria-pressed="true"]{border-color:var(--indigo);box-shadow:inset 0 0 0 1px var(--indigo)}
+.catbtn .n{font-size:.82rem;font-weight:600}
+.catbtn .s{font-size:.75rem;color:var(--muted)}
+.q{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.q .qt{font-weight:500}
+.q .qh{font-size:.84rem;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:420px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 6px;font-size:.84rem;font-weight:600}
+.seg button[aria-pressed="true"].oui{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.seg button[aria-pressed="true"].non{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.seg button[aria-pressed="true"].nsp{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.tag-data{font-size:.72rem;font-weight:600;color:var(--gold)}
+.locknote{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--sunk);border-radius:10px;padding:12px 14px;font-size:.88rem}
+.prio-group{display:flex;flex-direction:column;gap:6px}
+
+/* Conformité */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:st}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px}
+.step .dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-data);font-size:.85rem;background:var(--sunk);color:var(--muted);border:2px solid var(--line)}
+.step.ok .dot{background:var(--good);color:var(--surface);border-color:var(--good)}
+.step.lock .dot{opacity:.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.86rem;background:var(--surface)}
+.chip input{accent-color:var(--indigo);width:16px;height:16px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.82rem}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--sunk);font-weight:600;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.form{display:grid;grid-template-columns:1fr;gap:6px 16px;font-size:.88rem;background:var(--sunk);border-radius:10px;padding:14px}
+@media (min-width:600px){.form{grid-template-columns:200px 1fr}}
+.form dt{color:var(--muted)} .form dd{margin:0 0 6px;font-weight:500}
+.tpls{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:600px){.tpls{grid-template-columns:1fr 1fr}}
+.tpl{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.tpl .row{justify-content:space-between}
+ol.plain{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:.9rem}
+
+/* Plans */
+.plans{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:700px){.plans{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:900px) and (max-width:1100px){body:not(.out) .plans{grid-template-columns:1fr}}
+/* Comptes et accueil public */
+body.out .side, body.out .topbar, body.out .bottomnav{display:none}
+body.out .shell{grid-template-columns:1fr}
+body.out main{padding-bottom:48px}
+.avatar{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;background:var(--indigo);color:var(--indigo-ink);font-weight:700;font-size:.8rem;border:0;flex:none}
+.auth{max-width:460px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.auth.wide{max-width:640px}
+.auth form{gap:14px}
+.two{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:520px){.two{grid-template-columns:1fr 1fr}}
+.err,.info-msg{border-radius:10px;padding:10px 14px;font-size:.88rem;font-weight:500}
+.err{background:var(--bad-soft);color:var(--bad)}
+.info-msg{background:var(--info-soft);color:var(--info)}
+.landing{display:flex;flex-direction:column;gap:22px}
+.brand.big{font-size:1.6rem}
+.brand.big svg{width:38px;height:38px}
+.hero{font-size:clamp(1.8rem,5vw,2.7rem);max-width:22ch;line-height:1.08}
+.lead{font-size:1.05rem;max-width:62ch;color:var(--muted)}
+.feats{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:700px){.feats{grid-template-columns:repeat(3,1fr)}}
+.feat{border-top:3px solid var(--gold);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.feat p{font-size:.9rem}
+.f-info{background:var(--info)}
+.field input[readonly]{background:var(--sunk);color:var(--muted)}
+.card.danger{border-color:var(--bad)}
+.btn.danger-btn{background:var(--bad);color:var(--surface);border-color:var(--bad)}
+.btn.danger-outline{color:var(--bad);border-color:var(--bad)}
+.partners{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:700px){.partners{grid-template-columns:1fr 1fr}}
+.partner{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface);min-width:0}
+.partner.chosen{border-color:var(--indigo);box-shadow:inset 0 0 0 1px var(--indigo)}
+.partner ul{margin:0;padding-left:18px;font-size:.86rem;display:flex;flex-direction:column;gap:3px}
+.picklist{display:flex;flex-direction:column;gap:6px}
+.picklist .chip{align-items:flex-start}
+.picklist .chip input{margin-top:2px;flex:none}
+.field textarea{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 11px;font:inherit;font-size:.92rem;width:100%;resize:vertical}
+.plan{position:relative}
+.plan.current{border-color:var(--indigo);box-shadow:inset 0 0 0 1px var(--indigo)}
+.plan .price{font-family:var(--f-display);font-weight:800;font-size:1.6rem}
+.plan .price small{font-family:var(--f-body);font-size:.8rem;font-weight:500;color:var(--muted)}
+.plan ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.pay{display:flex;flex-direction:column;gap:10px;background:var(--sunk);border-radius:10px;padding:12px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.84rem}
+.field input,.field select{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 11px;font-size:.92rem;width:100%}
+
+/* Fenêtre et toast */
+.overlay{position:fixed;inset:0;z-index:20;background:rgb(10 12 28 / .55);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+@media (min-width:700px){.overlay{align-items:center}}
+.modal{background:var(--surface);color:var(--ink);border-radius:16px;width:100%;max-width:680px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden}
+.modal header{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.modal .mbody{padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.modal footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--line)}
+.doc{white-space:pre-wrap;font-size:.88rem;line-height:1.6;background:var(--sunk);border-radius:10px;padding:14px;margin:0;font-family:var(--f-body)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:.88rem;font-weight:600;max-width:calc(100% - 32px)}
+@media (min-width:900px){.toast{bottom:24px}}
+.foot{font-size:.78rem;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+  <aside class="side" id="side"></aside>
+  <div style="min-width:0">
+    <header class="topbar" id="topbar"></header>
+    <main id="main"></main>
+  </div>
+</div>
+<nav class="bottomnav" id="bottomnav" aria-label="Navigation principale"></nav>
+<div class="overlay" id="overlay" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ---------- Contenu ---------- */
+const PRIO = {
+  urgent:{label:"Urgent", tone:"bad", order:0},
+  m1:{label:"Sous 1 mois", tone:"warn", order:1},
+  m3:{label:"Sous 3 mois", tone:"info", order:2}
+};
+const CATS = [
+  {id:"acces", name:"Accès et mots de passe", qs:[
+    {id:"a1", t:"Chaque employé a-t-il son propre compte (pas de compte partagé) ?", h:"Un compte partagé empêche de savoir qui a fait quoi.", a:"Créer un compte individuel pour chaque employé", p:"m1", d:true, s:"Comptes individuels par employé"},
+    {id:"a2", t:"La double authentification est-elle activée sur l'email, WhatsApp et Mobile Money ?", h:"Un code reçu par SMS ou dans une application en plus du mot de passe.", a:"Activer la double authentification sur l'email, WhatsApp et Mobile Money", p:"urgent", d:true, s:"Double authentification sur les comptes critiques"},
+    {id:"a3", t:"Changez-vous les mots de passe quand un employé quitte l'entreprise ?", h:"", a:"Changer les mots de passe à chaque départ d'employé", p:"m1", d:true, s:"Révocation des accès au départ des employés"},
+    {id:"a4", t:"Utilisez-vous un mot de passe différent pour chaque service ?", h:"Le même mot de passe partout = un seul vol suffit.", a:"Utiliser un mot de passe unique par service (gestionnaire de mots de passe)", p:"m1", d:false}
+  ]},
+  {id:"sauv", name:"Sauvegardes et continuité", qs:[
+    {id:"b1", t:"Sauvegardez-vous vos données importantes au moins une fois par semaine ?", h:"Fichiers clients, comptabilité, stocks.", a:"Mettre en place une sauvegarde hebdomadaire automatique", p:"urgent", d:true, s:"Sauvegarde hebdomadaire des données"},
+    {id:"b2", t:"Une copie est-elle conservée hors du bureau ou dans le cloud ?", h:"En cas de vol, d'incendie ou d'inondation.", a:"Conserver une copie des sauvegardes hors des locaux", p:"m1", d:true, s:"Copie de sauvegarde hors site"},
+    {id:"b3", t:"Avez-vous testé la restauration d'une sauvegarde ces 6 derniers mois ?", h:"", a:"Tester la restauration d'une sauvegarde", p:"m3", d:false},
+    {id:"b4", t:"Vos équipements clés sont-ils protégés contre les coupures (onduleur) ?", h:"Les délestages peuvent corrompre les données.", a:"Installer un onduleur sur les équipements clés", p:"m3", d:false}
+  ]},
+  {id:"postes", name:"Postes et téléphones", qs:[
+    {id:"c1", t:"Un antivirus est-il actif sur tous les ordinateurs ?", h:"", a:"Installer et activer un antivirus sur chaque ordinateur", p:"urgent", d:true, s:"Antivirus sur tous les postes"},
+    {id:"c2", t:"Les mises à jour automatiques sont-elles activées ?", h:"Windows, Android, navigateurs.", a:"Activer les mises à jour automatiques", p:"m1", d:false},
+    {id:"c3", t:"Tous vos logiciels sont-ils officiels (aucun logiciel piraté) ?", h:"Les logiciels « crackés » contiennent souvent des virus.", a:"Remplacer les logiciels piratés par des versions officielles ou gratuites", p:"m1", d:false},
+    {id:"c4", t:"Les ordinateurs et téléphones sont-ils verrouillés par un code ?", h:"", a:"Activer le verrouillage par code sur tous les appareils", p:"urgent", d:true, s:"Verrouillage des appareils par code"}
+  ]},
+  {id:"reseau", name:"Réseau et Wi-Fi", qs:[
+    {id:"d1", t:"Votre Wi-Fi est-il protégé par un mot de passe fort ?", h:"Au moins 12 caractères, chiffrement WPA2 ou WPA3.", a:"Mettre un mot de passe Wi-Fi fort (WPA2/WPA3)", p:"urgent", d:true, s:"Wi-Fi chiffré et protégé"},
+    {id:"d2", t:"Les clients utilisent-ils un réseau Wi-Fi séparé du vôtre ?", h:"", a:"Créer un réseau Wi-Fi invité pour les clients", p:"m3", d:false},
+    {id:"d3", t:"Avez-vous changé le mot de passe administrateur de la box ?", h:"Le mot de passe d'usine est souvent connu.", a:"Changer le mot de passe administrateur de la box", p:"m1", d:false}
+  ]},
+  {id:"paie", name:"Paiements et fraude", qs:[
+    {id:"e1", t:"Vérifiez-vous chaque paiement Mobile Money dans l'application avant de livrer ?", h:"Un SMS de confirmation peut être faux.", a:"Vérifier chaque paiement dans l'application Orange Money / Moov Money, jamais sur SMS seul", p:"urgent", d:false},
+    {id:"e2", t:"Le code secret Mobile Money est-il connu d'une seule personne ?", h:"", a:"Réserver le code secret Mobile Money au gérant", p:"urgent", d:false},
+    {id:"e3", t:"Vos employés savent-ils reconnaître les faux SMS et les arnaques WhatsApp ?", h:"", a:"Former l'équipe aux arnaques Mobile Money et WhatsApp", p:"m1", d:false},
+    {id:"e4", t:"Les gros paiements demandent-ils une double validation ?", h:"", a:"Instaurer une double validation au-delà d'un montant fixé", p:"m3", d:false}
+  ]},
+  {id:"web", name:"Site web et réseaux sociaux", qs:[
+    {id:"f1", t:"Votre site web est-il en HTTPS (cadenas dans le navigateur) ?", h:"Répondez Oui si vous n'avez pas de site.", a:"Activer le HTTPS sur le site web", p:"m1", d:true, s:"Site web chiffré (HTTPS)"},
+    {id:"f2", t:"Au moins deux personnes de confiance administrent-elles vos pages ?", h:"Facebook, WhatsApp Business, Instagram.", a:"Ajouter un second administrateur de confiance sur les pages", p:"m3", d:false},
+    {id:"f3", t:"Vos comptes de réseaux sociaux ont-ils la double authentification ?", h:"", a:"Activer la double authentification sur les réseaux sociaux", p:"urgent", d:false}
+  ]},
+  {id:"sensi", name:"Sensibilisation des employés", qs:[
+    {id:"g1", t:"Vos employés ont-ils été formés à la cybersécurité cette année ?", h:"", a:"Organiser une session de sensibilisation (quiz Shield)", p:"m3", d:true, s:"Sensibilisation annuelle du personnel"},
+    {id:"g2", t:"Savez-vous qui appeler et quoi faire en cas d'incident ?", h:"Piratage, vol de téléphone, fuite de fichier.", a:"Rédiger la fiche « que faire en cas d'incident »", p:"m1", d:true, s:"Procédure de gestion des incidents"},
+    {id:"g3", t:"Vos employés savent-ils reconnaître un message d'hameçonnage ?", h:"Faux lien, fausse banque, faux opérateur.", a:"Entraîner l'équipe à repérer l'hameçonnage", p:"m1", d:false}
+  ]}
+];
+const ALLQ = CATS.flatMap(c => c.qs.map(q => ({...q, cat:c})));
+
+const DATA_TYPES = {
+  clients:{label:"Fichier clients", tr:"Gestion de la clientèle", fin:"Suivi des commandes, facturation, relances", don:"Nom, téléphone, adresse, historique d'achats", base:"Exécution du contrat", duree:"3 ans après le dernier achat", dest:"Personnel commercial"},
+  employes:{label:"Données des employés", tr:"Gestion du personnel", fin:"Paie, contrats, déclarations sociales", don:"Identité, coordonnées, salaire, n° INPS", base:"Obligation légale", duree:"5 ans après le départ", dest:"Direction, comptable, INPS"},
+  cameras:{label:"Vidéosurveillance", tr:"Vidéosurveillance des locaux", fin:"Sécurité des personnes et des biens", don:"Images des personnes filmées", base:"Intérêt légitime", duree:"30 jours", dest:"Gérant"},
+  whatsapp:{label:"Contacts WhatsApp clients", tr:"Communication par WhatsApp", fin:"Prise de commandes, informations clients", don:"Nom, numéro, messages", base:"Consentement", duree:"Jusqu'au retrait du consentement", dest:"Personnel commercial"},
+  paiement:{label:"Paiements Mobile Money", tr:"Encaissements Mobile Money", fin:"Encaissement et preuve de paiement", don:"Numéro, montant, référence de transaction", base:"Exécution du contrat", duree:"Durée des obligations comptables", dest:"Comptable, opérateur de paiement"},
+  sante:{label:"Données de santé", tr:"Suivi des patients", fin:"Suivi médical", don:"Dossier médical", base:"Consentement explicite", duree:"Selon la réglementation médicale", dest:"Personnel soignant", sensitive:true}
+};
+
+const CHECKS = [
+  {k:"carto", t:"Cartographier les données personnelles", p:"urgent"},
+  {k:"registre", t:"Valider le registre des traitements", p:"m1"},
+  {k:"decl", t:"Déposer la déclaration des traitements auprès de l'APDP", p:"urgent"},
+  {k:"politique", t:"Publier la politique de confidentialité", p:"m1"},
+  {k:"consent", t:"Mettre en place le recueil du consentement", p:"m1"},
+  {k:"camera", t:"Afficher l'information sur la vidéosurveillance", p:"m1", cond:s => s.data.cameras},
+  {k:"fuite", t:"Adopter la procédure en cas de fuite de données", p:"m3"}
+];
+
+const PLANS = [
+  {id:"decouverte", rank:0, name:"Découverte", price:"Gratuit", per:"", pitch:"Pour faire le point rapidement.",
+   feats:["Diagnostic rapide (2 questions par catégorie)","Rapport de diagnostic téléchargeable en PDF"]},
+  {id:"essentiel", rank:1, name:"Essentiel", price:"50 000", per:"FCFA / mois", pitch:"Pour sécuriser son entreprise en autonomie.",
+   feats:["Diagnostic complet, 7 catégories","Rapport de diagnostic en PDF","Plan d'action priorisé","Support Shield 24h/24 et 7j/7","Module conformité : registre, dossier APDP, modèles de documents"]},
+  {id:"premium", rank:2, name:"Premium", price:"100 000", per:"FCFA / mois", pitch:"Pour être accompagné sur place par un expert.",
+   feats:["Tout le plan Essentiel","Accompagnement sur place par un partenaire au choix : ISMACORP ou TEKNOFORCE"]}
+];
+const PARTNERS = [
+  {id:"ismacorp", name:"ISMACORP", city:"Bamako", tagline:"Cybersécurité et conformité",
+   skills:["Supervision SOC (8/5 ou 24/7)","Audit de sécurité et tests d'intrusion","Accompagnement ISO 27001 et PCI DSS","Sécurité physique : contrôle d'accès, vidéosurveillance IP","Sensibilisation et formations en cybersécurité"],
+   best:["acces","postes","paie","web","sensi"]},
+  {id:"teknoforce", name:"TEKNOFORCE SARL", city:"Bamako", tagline:"Réseaux et infrastructures",
+   skills:["Audit, sécurisation et maintenance des réseaux (LAN, WAN, Wi-Fi, téléphonie IP)","Serveurs, virtualisation et data center","Archivage électronique et stockage sécurisé","Câblage et courant faible","Protection des données sensibles","Formation professionnelle"],
+   best:["reseau","sauv","postes"]}
+];
+
+/* ---------- État ---------- */
+const KEY = "shield-proto-v3", DEMO = "demo@shield.ml", DEMO_PW = "shield2026";
+function newState(company){
+  return {sample:false, plan:"decouverte", partner:null, tickets:[], requests:[], tab:"tableau", diagView:"intro", diagCat:0, filter:"tout",
+    company, answers:{}, data:{clients:true}, checks:{}, statuses:{}};
+}
+function sampleState(){
+  return {
+    sample:true, plan:"premium", partner:null, tickets:[], requests:[], tab:"tableau", diagView:"questions", diagCat:0, filter:"tout",
+    company:{name:"Kanté Distribution", city:"Bamako, ACI 2000", sector:"Commerce de gros", staff:"12", rccm:"MA.BKO.2021.B.XXXX", contact:"contact@kante-distribution.ml"},
+    answers:{a1:"non",a2:"non",a3:"oui",a4:"nsp",b1:"oui",b2:"non",b3:"nsp",b4:"oui",c1:"oui",c2:"non",c3:"non",c4:"oui",d1:"oui",d2:"non",d3:"nsp",e1:"oui",e2:"oui",e3:"non",e4:"nsp",f1:"oui",f2:"non",f3:"non",g1:"non",g2:"non",g3:"nsp"},
+    data:{clients:true, employes:true, cameras:true, whatsapp:true, paiement:true, sante:false},
+    checks:{carto:true},
+    statuses:{"q-a2":"doing"}
+  };
+}
+/* Comptes : enregistrés dans ce navigateur pour le prototype (mot de passe haché) */
+let DB = null;
+try { DB = JSON.parse(localStorage.getItem(KEY)); } catch(e){}
+if (!DB || typeof DB.users !== "object") DB = {users:{}, session:null};
+let S = null;
+const UI = {pay:null, showDone:false, auth:"landing"};
+const ME = () => DB.session && DB.users[DB.session] ? DB.users[DB.session] : null;
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
+function save(){ if (S && ME()) ME().state = S; persist(); }
+async function hash(pw, salt){
+  try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(salt + ":" + pw));
+        return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
+  catch(e){ let h = 7; for (const ch of salt + ":" + pw) h = (h * 31 + ch.charCodeAt(0)) | 0; return "x" + h; }
+}
+const initials = n => (n||"").split(/\s+/).filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join("") || "?";
+const firstName = n => (n||"").trim().split(/\s+/)[0] || "";
+
+/* ---------- Calculs ---------- */
+const rank = () => PLANS.find(p => p.id === S.plan).rank;
+const availQs = c => rank() >= 1 ? c.qs : c.qs.slice(0,2);
+function catScore(c){ const qs = availQs(c); return Math.round(100 * qs.filter(q => S.answers[q.id]==="oui").length / qs.length); }
+function catAnswered(c){ return availQs(c).filter(q => S.answers[q.id]).length; }
+function cyberScore(){ return Math.round(CATS.reduce((s,c) => s + catScore(c), 0) / CATS.length); }
+const dataQs = () => ALLQ.filter(q => q.d && availQs(q.cat).includes(q.cat.qs.find(x => x.id===q.id)));
+const secOK = () => dataQs().every(q => S.answers[q.id]==="oui");
+const applicableChecks = () => CHECKS.filter(c => !c.cond || c.cond(S));
+function complianceScore(){
+  const ch = applicableChecks();
+  const done = ch.filter(c => S.checks[c.k]).length + (secOK() ? 1 : 0);
+  return Math.round(100 * done / (ch.length + 1));
+}
+const tone = v => v < 40 ? "bad" : v < 70 ? "warn" : "good";
+function actions(){
+  const list = [];
+  CATS.forEach(c => availQs(c).forEach(q => {
+    const id = "q-" + q.id;
+    if (S.answers[q.id] !== "oui" || S.statuses[id] === "done")
+      list.push({id, title:q.a, p:q.p, src:"Cyber", cat:c.name, data:q.d, done:S.statuses[id]==="done" && S.answers[q.id]==="oui"});
+  }));
+  applicableChecks().forEach(c => {
+    const id = "c-" + c.k;
+    list.push({id, title:c.t, p:c.p, src:"Conformité", cat:"Loi n° 2013-015", done:!!S.checks[c.k]});
+  });
+  return list.sort((a,b) => (a.done - b.done) || (PRIO[a.p].order - PRIO[b.p].order));
+}
+const statusOf = a => a.done ? "done" : (S.statuses[a.id] || "todo");
+const STATUS_LABEL = {todo:"À faire", doing:"En cours", done:"Fait"};
+
+/* ---------- Utilitaires ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const $ = id => document.getElementById(id);
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,2600); }
+const ICONS = {
+  tableau:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  diagnostic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/></svg>',
+  conformite:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
+  assistance:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/><path d="M19 20c0 1-2 2-5 2"/></svg>',
+  plans:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg>'
+};
+const TABS = [["tableau","Tableau de bord","Accueil"],["diagnostic","Diagnostic","Diagnostic"],["conformite","Conformité","Conformité"],["assistance","Assistance","Assistance"],["plans","Plans","Plans"]];
+const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l12 4.5v9c0 7-5 12.6-12 14.5C9 28.1 4 22.5 4 15.5v-9z" fill="var(--indigo)"/><path d="M16 7v18.5c4.6-1.6 7.8-5.5 7.8-10.3V9.6z" fill="var(--gold)"/><path d="M11 16l3.5 3.5L21 13" fill="none" stroke="var(--surface)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const planName = () => PLANS.find(p => p.id===S.plan).name;
+const lockNote = (txt, need) => `<div class="locknote"><span>🔒 ${txt}</span><button class="btn small primary" data-act="goplans">Voir le plan ${need}</button></div>`;
+
+/* ---------- Coque ---------- */
+function renderShell(){
+  const navOf = short => TABS.map(([id,l,s]) => `<button class="navbtn" data-act="tab" data-v="${id}" ${S.tab===id?'aria-current="page"':''}>${ICONS[id]}<span>${short?s:l}</span></button>`).join("");
+  const nav = navOf(true);
+  $("side").innerHTML = `<div class="brand">${LOGO}Shield</div>${navOf(false)}
+    <div class="plan-box"><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="avatar">${initials(ME().name)}</span><div style="min-width:0"><strong style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(ME().name)}</strong><span class="muted" style="font-size:.78rem">Plan ${planName()}</span></div></div>
+      <button class="link" data-act="tab" data-v="compte" style="text-align:left">Mon compte</button><button class="link" data-act="logout" style="text-align:left">Se déconnecter</button></div>`;
+  $("topbar").innerHTML = `<div class="brand">${LOGO}Shield</div><div class="row"><button class="plan-chip" data-act="tab" data-v="plans">${planName()}</button><button class="avatar" data-act="tab" data-v="compte" aria-label="Mon compte">${initials(ME().name)}</button></div>`;
+  $("bottomnav").innerHTML = nav;
+}
+
+function ring(v, label){
+  const r=46, c=2*Math.PI*r;
+  return `<div class="ring"><svg viewBox="0 0 120 120" role="img" aria-label="${label} : ${v} sur 100">
+    <circle class="ring-bg" cx="60" cy="60" r="${r}"/>
+    <circle class="ring-fg s-${tone(v)}" cx="60" cy="60" r="${r}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c*(1-v/100)).toFixed(1)}" transform="rotate(-90 60 60)"/>
+    <text class="ring-num" x="60" y="62">${v}</text><text class="ring-unit" x="60" y="80">/ 100</text></svg>
+    <span class="ring-label">${label}</span></div>`;
+}
+
+function actionItem(a){
+  const st = statusOf(a);
+  return `<li class="action ${a.done?'done':''}"><span class="stripe st-${a.p}"></span>
+    <div class="body"><span class="title">${esc(a.title)}</span>
+      <div class="meta"><span class="pill t-${PRIO[a.p].tone}">${PRIO[a.p].label}</span><span class="pill t-neutral">${a.src} · ${esc(a.cat)}</span>${a.data?'<span class="pill t-gold">Touche aussi la conformité</span>':''}</div></div>
+    <button class="status ${st}" data-act="cycle" data-v="${a.id}" aria-label="Statut : ${STATUS_LABEL[st]}. Changer">${STATUS_LABEL[st]}</button></li>`;
+}
+
+/* ---------- Tableau de bord ---------- */
+function renderTableau(){
+  const cs = cyberScore(), ks = complianceScore();
+  const crossFails = dataQs().filter(q => S.answers[q.id] !== "oui");
+  let acts = actions();
+  if (S.filter==="cyber") acts = acts.filter(a => a.src==="Cyber");
+  if (S.filter==="conf") acts = acts.filter(a => a.src==="Conformité");
+  const open = acts.filter(a => !a.done), done = acts.filter(a => a.done);
+  const c = S.company;
+  const top = `${S.sample ? `<div class="sample"><span>Compte de démonstration : l'entreprise et les réponses sont fictives.</span><button class="btn small" data-act="logout">Quitter la démo</button></div>`:""}
+  <div class="head"><div><span class="eyebrow">${esc(c.sector)} · ${esc(c.city)} · ${esc(c.staff)} employés</span><h1>${esc(c.name)}</h1></div>
+    <button class="btn small" data-act="tab" data-v="compte">Modifier le profil</button></div>
+  <div class="strip" aria-hidden="true"></div>`;
+  if (!ALLQ.some(q => S.answers[q.id])) return top + welcome();
+  return `${top}
+  <section class="grid2">
+    <div class="card"><div class="rings">${ring(cs,"Sécurité")}${ring(ks,"Conformité")}</div>
+      ${crossFails.length ? `<p class="cross"><strong>${crossFails.length} faille${crossFails.length>1?'s':''} de sécurité</strong> expose${crossFails.length>1?'nt':''} aussi les données personnelles de vos clients et employés. Les corriger fait monter vos deux scores.</p>` : `<p class="cross">Les mesures de sécurité qui protègent les données personnelles sont toutes en place.</p>`}
+    </div>
+    <div class="card"><div class="head"><h2>Sécurité par catégorie</h2><button class="link" data-act="tab" data-v="diagnostic">Diagnostic</button></div>
+      <div class="bars">${CATS.map(cat => { const v=catScore(cat); return `<div class="bar"><span class="lbl">${cat.name}</span><span class="val num">${v}</span><div class="track"><div class="fill f-${tone(v)}" style="width:${v}%"></div></div></div>`; }).join("")}</div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="head"><div><h2>Plan d'action</h2><span class="muted" style="font-size:.86rem">${open.length} action${open.length>1?'s':''} à mener. Touchez un statut pour le faire avancer.</span></div>
+      <div class="filters" role="group" aria-label="Filtrer">${[["tout","Tout"],["cyber","Cyber"],["conf","Conformité"]].map(([k,l]) => `<button class="fbtn" data-act="filter" data-v="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join("")}</div></div>
+    ${rank()<1 && S.filter!=="conf" ? lockNote("Le plan d'action détaillé est inclus à partir du plan Essentiel.","Essentiel") : ""}
+    <ul class="actions">${(rank()<1 ? open.filter(a=>a.src!=="Cyber") : open).map(actionItem).join("") || '<li class="muted" style="padding:12px 0">Aucune action en attente.</li>'}</ul>
+    ${done.length ? `<button class="link" data-act="showdone">${UI.showDone?"Masquer":"Afficher"} les actions terminées (${done.length})</button>${UI.showDone?`<ul class="actions">${done.map(actionItem).join("")}</ul>`:""}` : ""}
+  </section>
+  ${partnerTeaser()}`;
+}
+function welcome(){
+  const steps = [["Faire le diagnostic", rank()>=1 ? "25 questions, environ 15 minutes" : "14 questions, environ 5 minutes"],
+                 ["Suivre le plan d'action", "Les actions sont classées par urgence"],
+                 ["Se mettre en conformité", "Registre, déclaration APDP, documents obligatoires"]];
+  return `<section class="card"><span class="eyebrow">Bienvenue</span><h2>Bonjour ${esc(firstName(ME().name))}, commençons par évaluer votre entreprise</h2>
+    <ol class="steps">${steps.map(([t,d],i) => `<li class="step"><span class="dot">${i+1}</span><div style="display:flex;flex-direction:column;gap:2px;justify-content:center"><strong>${t}</strong><span class="muted" style="font-size:.86rem">${d}</span></div></li>`).join("")}</ol>
+    <div class="row"><button class="btn primary" data-act="startdiag">Démarrer le diagnostic</button></div></section>
+  ${partnerTeaser()}`;
+}
+
+/* ---------- Diagnostic ---------- */
+function renderDiagnostic(){
+  const total = CATS.reduce((s,c)=>s+availQs(c).length,0), answered = CATS.reduce((s,c)=>s+catAnswered(c),0);
+  if (S.diagView === "intro") return renderDiagIntro(answered, total);
+  const tabs = `<div class="tabs2" role="group"><button data-act="dview" data-v="intro" aria-pressed="false">Accueil</button><button data-act="dview" data-v="questions" aria-pressed="${S.diagView==="questions"}">Questionnaire</button><button data-act="dview" data-v="rapport" aria-pressed="${S.diagView==="rapport"}">Rapport</button></div>`;
+  const head = `<div class="head"><div><span class="eyebrow">Module 1</span><h1>Diagnostic cyber</h1><span class="muted num" style="font-size:.85rem">${answered} / ${total} réponses</span></div>${tabs}</div>`;
+  if (S.diagView === "rapport") return head + renderRapport();
+  const cat = CATS[S.diagCat], qs = availQs(cat), hidden = cat.qs.length - qs.length;
+  return head + `
+  <div class="catscroll" role="group" aria-label="Catégories">${CATS.map((c,i) => `<button class="catbtn" data-act="cat" data-v="${i}" aria-pressed="${i===S.diagCat}"><span class="n">${c.name}</span><span class="s num">${catAnswered(c)}/${availQs(c).length} · ${catScore(c)}/100</span></button>`).join("")}</div>
+  <section class="card"><div class="head"><h2>${cat.name}</h2><span class="pill t-${tone(catScore(cat))} num">${catScore(cat)} / 100</span></div>
+    <div>${qs.map(q => `<div class="q"><span class="qt">${q.t}</span>${q.h?`<span class="qh">${q.h}</span>`:""}${q.d?'<span class="tag-data">Mesure exigée aussi pour protéger les données personnelles</span>':""}
+      <div class="seg" role="group" aria-label="Réponse">${[["oui","Oui"],["non","Non"],["nsp","Je ne sais pas"]].map(([v,l]) => `<button class="${v}" data-act="ans" data-q="${q.id}" data-v="${v}" aria-pressed="${S.answers[q.id]===v}">${l}</button>`).join("")}</div></div>`).join("")}</div>
+    ${hidden ? lockNote(`${hidden} question${hidden>1?'s':''} de plus dans cette catégorie avec le plan Essentiel.`,"Essentiel") : ""}
+    <div class="row" style="justify-content:space-between">
+      <button class="btn" data-act="cat" data-v="${Math.max(0,S.diagCat-1)}" ${S.diagCat===0?"disabled":""}>Précédent</button>
+      ${S.diagCat < CATS.length-1 ? `<button class="btn primary" data-act="cat" data-v="${S.diagCat+1}">Catégorie suivante</button>` : `<button class="btn primary" data-act="dview" data-v="rapport">Voir le rapport</button>`}
+    </div></section>`;
+}
+function renderDiagIntro(answered, total){
+  const mins = rank() >= 1 ? "15" : "5";
+  return `<div class="head"><div><span class="eyebrow">Module 1</span><h1>Diagnostic cyber</h1></div></div>
+  <section class="card"><h2>${answered ? "Votre diagnostic est en cours" : "Évaluez la sécurité de votre entreprise"}</h2>
+    <p style="max-width:65ch">${total} questions en 7 catégories, environ ${mins} minutes. Répondez par Oui, Non ou Je ne sais pas. À la fin, vous obtenez un score sur 100${rank() >= 1 ? ", un plan d'action priorisé" : ""} et un rapport à télécharger en PDF.</p>
+    <div class="bars">${CATS.map(c => `<div class="bar"><span class="lbl">${c.name}</span><span class="val num muted">${catAnswered(c)}/${availQs(c).length}</span><div class="track"><div class="fill f-info" style="width:${Math.round(100*catAnswered(c)/availQs(c).length)}%"></div></div></div>`).join("")}</div>
+    <p class="muted" style="font-size:.86rem">« Je ne sais pas » compte comme un risque. En cas de doute, demandez à la personne qui gère votre informatique.</p>
+    <div class="row">${answered === total
+      ? `<button class="btn primary" data-act="dview" data-v="rapport">Voir le rapport</button><button class="btn" data-act="startdiag">Revoir mes réponses</button>`
+      : answered ? `<button class="btn primary" data-act="startdiag">Reprendre le diagnostic</button><button class="btn" data-act="dview" data-v="rapport">Voir le rapport</button>`
+      : `<button class="btn primary" data-act="startdiag">Démarrer le diagnostic</button>`}</div>
+    ${!answered ? "" : UI.confirmRestart
+      ? `<div class="locknote"><span>Effacer toutes vos réponses et recommencer ?</span><div class="row"><button class="btn small primary" data-act="restart">Oui, recommencer</button><button class="btn small" data-act="cancelrestart">Annuler</button></div></div>`
+      : `<button class="link" data-act="askrestart" style="align-self:flex-start">Recommencer un nouveau diagnostic</button>`}
+  </section>`;
+}
+function renderRapport(){
+  const cs = cyberScore();
+  const sorted = [...CATS].sort((a,b)=>catScore(a)-catScore(b));
+  const acts = actions().filter(a => a.src==="Cyber" && !a.done);
+  const groups = Object.keys(PRIO).map(p => [p, acts.filter(a=>a.p===p)]).filter(([,l])=>l.length);
+  return `
+  <section class="card"><div class="grid2" style="align-items:center">${ring(cs,"Score global")}
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><span class="eyebrow">Rapport du ${new Date().toLocaleDateString("fr-FR")}</span>
+      <p><strong>${esc(S.company.name)}</strong> obtient ${cs}/100. ${cs<40?"Le niveau de protection est insuffisant : plusieurs risques peuvent bloquer l'activité.":cs<70?"Les bases sont là, mais des failles importantes restent ouvertes.":"Bon niveau de protection : maintenez vos bonnes pratiques."}</p>
+      <p class="muted" style="font-size:.88rem">Points les plus faibles : ${sorted.slice(0,2).map(c=>`${c.name} (${catScore(c)})`).join(", ")}.</p>
+      ${UI.dl ? `<button class="btn primary" data-act="pdf" ${UI.pdfBusy?"disabled":""}>${UI.pdfBusy?"Préparation du PDF…":"Télécharger le rapport (PDF)"}</button>` : ""}</div></div></section>
+  <section class="card"><h2>Plan d'action priorisé</h2>
+    ${rank()<1 ? lockNote("Le plan d'action détaillé est inclus à partir du plan Essentiel.","Essentiel") :
+      groups.map(([p,l]) => `<div class="prio-group"><span class="pill t-${PRIO[p].tone}" style="align-self:flex-start">${PRIO[p].label} · ${l.length}</span><ul class="actions">${l.map(actionItem).join("")}</ul></div>`).join("") || '<p class="muted">Aucune action ouverte. Bravo.</p>'}
+    </section>`;
+}
+
+/* ---------- Rapport PDF ---------- */
+async function downloadReport(){
+  if (!window.jspdf){ toast("Le générateur PDF n'a pas pu se charger. Rechargez la page."); return; }
+  UI.pdfBusy = true; render();
+  try {
+    const {jsPDF} = window.jspdf;
+    const doc = new jsPDF({unit:"mm", format:"a4"});
+    const W = 210, M = 18, BOTTOM = 278;
+    const C = {indigo:[42,56,137], gold:[201,134,18], ink:[21,26,52], muted:[88,95,126], line:[218,221,234], sunk:[233,235,243],
+               good:[23,128,79], warn:[178,106,6], bad:[188,51,40], info:[61,91,184]};
+    const clean = s => String(s ?? "").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[  ]/g," ");
+    const toneRGB = v => C[tone(v)];
+    const date = new Date().toLocaleDateString("fr-FR");
+    let y = 0;
+    const ensure = h => { if (y + h > BOTTOM){ doc.addPage(); y = 20; } };
+    const font = (size, style="normal", color=C.ink) => { doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(...color); };
+    const para = (t, size=10, style="normal", color=C.ink, x=M, w=W-2*M) => {
+      font(size, style, color); const lines = doc.splitTextToSize(clean(t), w); const h = lines.length * size * 0.42;
+      ensure(h + 1); doc.text(lines, x, y + size*0.3); y += h + 2; };
+    const h2 = t => { ensure(16); y += 5; font(13, "bold", C.indigo); doc.text(clean(t), M, y); y += 2.5;
+      doc.setDrawColor(...C.line); doc.setLineWidth(0.3); doc.line(M, y, W-M, y); y += 6; };
+
+    // En-tête
+    doc.setFillColor(...C.indigo); doc.rect(0, 0, W, 30, "F");
+    doc.setFillColor(...C.gold); doc.rect(0, 30, W, 1.6, "F");
+    font(20, "bold", [255,255,255]); doc.text("Shield", M, 14);
+    font(10, "normal", [255,255,255]); doc.text("Rapport de diagnostic cybersécurité", M, 22);
+    doc.text(clean("Édité le " + date), W-M, 22, {align:"right"});
+    y = 42;
+
+    // Entreprise + score global
+    const c = S.company, cs = cyberScore();
+    font(16, "bold"); doc.text(clean(c.name), M, y); y += 6;
+    para(`${c.sector} · ${c.city} · ${c.staff} employés · RCCM ${c.rccm}`, 9.5, "normal", C.muted);
+    y += 3;
+    const boxH = 30; ensure(boxH);
+    doc.setFillColor(...C.sunk); doc.roundedRect(M, y, W-2*M, boxH, 3, 3, "F");
+    font(30, "bold", toneRGB(cs)); doc.text(String(cs), M+8, y+19);
+    font(10, "normal", C.muted); doc.text("/ 100", M+8 + doc.getTextWidth(String(cs))*3.1 + 2, y+19);
+    const verdict = cs<40 ? "Niveau de protection insuffisant : plusieurs risques peuvent bloquer l'activité."
+      : cs<70 ? "Les bases sont là, mais des failles importantes restent ouvertes."
+      : "Bon niveau de protection : maintenez vos bonnes pratiques.";
+    font(10.5, "bold"); doc.text("Score global de sécurité", M+42, y+11);
+    font(9.5, "normal", C.ink); doc.text(doc.splitTextToSize(clean(verdict), W-2*M-50), M+42, y+17);
+    y += boxH + 4;
+    const crossN = dataQs().filter(q => S.answers[q.id] !== "oui").length;
+    if (crossN) para(`${crossN} faille(s) exposent aussi les données personnelles de vos clients et employés. La loi n° 2013-015 du 21 mai 2013 impose de protéger ces données : les corriger améliore aussi votre conformité.`, 9.5, "normal", C.gold);
+
+    // Scores par catégorie
+    h2("Scores par catégorie");
+    CATS.forEach(cat => {
+      const v = catScore(cat); ensure(9);
+      font(10, "normal"); doc.text(clean(cat.name), M, y+3.5);
+      const bx = 100, bw = 72;
+      doc.setFillColor(...C.sunk); doc.roundedRect(bx, y, bw, 4.5, 1.5, 1.5, "F");
+      if (v > 0){ doc.setFillColor(...toneRGB(v)); doc.roundedRect(bx, y, Math.max(3, bw*v/100), 4.5, 1.5, 1.5, "F"); }
+      font(10, "bold", toneRGB(v)); doc.text(String(v), W-M, y+3.8, {align:"right"});
+      y += 8.5;
+    });
+
+    // Plan d'action
+    h2("Plan d'action priorisé");
+    if (rank() < 1) {
+      para("Le plan d'action détaillé est inclus à partir du plan Essentiel.", 10, "italic", C.muted);
+    } else {
+      const acts = actions().filter(a => a.src==="Cyber" && !a.done);
+      if (!acts.length) para("Aucune action ouverte. Toutes les mesures évaluées sont en place.", 10);
+      Object.keys(PRIO).forEach(p => {
+        const list = acts.filter(a => a.p===p); if (!list.length) return;
+        ensure(12); y += 1;
+        const col = C[PRIO[p].tone]; const label = `${PRIO[p].label} (${list.length})`;
+        font(9, "bold", [255,255,255]); const lw = doc.getTextWidth(label) + 6;
+        doc.setFillColor(...col); doc.roundedRect(M, y, lw, 6, 3, 3, "F"); doc.text(label, M+3, y+4.2); y += 9;
+        list.forEach(a => {
+          font(10, "normal"); const lines = doc.splitTextToSize(clean(a.title), W-2*M-10); const h = lines.length*4.2;
+          ensure(h + 7);
+          doc.setDrawColor(...col); doc.setLineWidth(0.4); doc.rect(M+1, y-0.2, 3.4, 3.4);
+          doc.text(lines, M+8, y+2.7);
+          font(8, "normal", C.muted); doc.text(clean(a.cat + (a.data ? " · touche aussi la conformité" : "")), M+8, y+h+2.2);
+          y += h + 6;
+        });
+      });
+    }
+
+    // Réponses détaillées
+    h2("Réponses détaillées");
+    const ANS = {oui:["Oui",C.good], non:["Non",C.bad], nsp:["Ne sait pas",C.warn]};
+    CATS.forEach(cat => {
+      ensure(14); font(10.5, "bold"); doc.text(clean(`${cat.name} · ${catScore(cat)}/100`), M, y+3); y += 7;
+      availQs(cat).forEach(q => {
+        font(9.5, "normal"); const lines = doc.splitTextToSize(clean(q.t), W-2*M-30); const h = lines.length*4;
+        ensure(h + 3); doc.text(lines, M, y+2.6);
+        const [lab, col] = ANS[S.answers[q.id]] || ["Sans réponse", C.muted];
+        font(9.5, "bold", col); doc.text(lab, W-M, y+2.6, {align:"right"});
+        y += h + 3;
+      });
+      y += 2;
+    });
+
+    // Pieds de page
+    const n = doc.getNumberOfPages();
+    for (let i = 1; i <= n; i++){
+      doc.setPage(i); doc.setDrawColor(...C.line); doc.setLineWidth(0.3); doc.line(M, 285, W-M, 285);
+      font(7.5, "normal", C.muted);
+      doc.text(clean("Shield · Rapport indicatif établi à partir des réponses déclarées. Ne remplace pas un audit sur site."), M, 290);
+      doc.text(`${i} / ${n}`, W-M, 290, {align:"right"});
+    }
+
+    const slug = (c.name || "entreprise").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-|-$/g,"");
+    const iso = new Date().toISOString().slice(0,10);
+    await UI.dl.save({filename:`Rapport-Shield-${slug}-${iso}.pdf`, data: doc.output("blob")});
+    toast("Rapport téléchargé.");
+  } catch (err) {
+    const code = err && err.code;
+    if (code === "declined") toast("Téléchargement annulé.");
+    else if (code === "rate_limited") toast("Une demande de téléchargement est déjà ouverte.");
+    else if (code === "unavailable" || code === "not_granted" || code === "capability_disabled" || code === "capability_removed") { UI.dl = null; toast("Le téléchargement n'est pas disponible ici."); }
+    else toast("Le PDF n'a pas pu être créé. Réessayez.");
+  } finally { UI.pdfBusy = false; render(); }
+}
+
+/* ---------- Conformité ---------- */
+function registreRows(){ return Object.keys(DATA_TYPES).filter(k=>S.data[k]).map(k=>DATA_TYPES[k]); }
+function measures(){ const m = dataQs().filter(q=>S.answers[q.id]==="oui").map(q=>q.s); return m.length?m:["Aucune mesure déclarée à ce jour"]; }
+function renderConformite(){
+  const ks = complianceScore(), r = rank(), rows = registreRows();
+  const step = (n, ok, locked, title, body) => `<li class="step ${ok?'ok':''} ${locked?'lock':''}"><span class="dot">${ok?"✓":n}</span><div class="card"><div class="head"><h3>${title}</h3>${ok?'<span class="pill t-good">Fait</span>':''}</div>${body}</div></li>`;
+  const c = S.company;
+  const tpls = [
+    {k:"politique", t:"Politique de confidentialité", d:"À publier sur votre site, votre page Facebook ou à afficher en boutique.", show:true},
+    {k:"consent", t:"Formulaire de consentement", d:"Pour les clients ajoutés à WhatsApp ou à vos listes d'information.", show:true},
+    {k:"camera", t:"Affiche vidéosurveillance", d:"À placer à l'entrée des zones filmées.", show:!!S.data.cameras},
+    {k:"clause", t:"Clause pour les contrats de travail", d:"Informe les employés du traitement de leurs données.", show:!!S.data.employes}
+  ].filter(t=>t.show);
+  return `
+  <div class="head"><div><span class="eyebrow">Module 2 · Loi n° 2013-015 du 21 mai 2013</span><h1>Conformité des données</h1></div><span class="pill t-${tone(ks)} num" style="font-size:.9rem">${ks} / 100</span></div>
+  <p class="muted" style="max-width:65ch">Six étapes pour déclarer vos traitements à l'APDP et produire les documents exigés. Votre score de sécurité compte aussi : la loi impose de protéger les données que vous collectez.</p>
+  <ol class="steps">
+  ${step(1, S.checks.carto, false, "Cartographier vos données", `
+    <p class="muted" style="font-size:.88rem">Cochez les données personnelles que votre entreprise collecte.</p>
+    <div class="chips">${Object.entries(DATA_TYPES).map(([k,d]) => `<label class="chip"><input type="checkbox" id="dt-${k}" data-act="dtype" data-v="${k}" ${S.data[k]?"checked":""}>${d.label}</label>`).join("")}</div>
+    ${S.data.sante ? '<p class="cross">Les données de santé sont des données sensibles : les formalités auprès de l\'APDP sont renforcées. À vérifier au cas par cas.</p>' : ""}
+    <div class="row"><button class="btn ${S.checks.carto?'':'primary'}" data-act="check" data-v="carto">${S.checks.carto?"Cartographie validée":"Valider la cartographie"}</button></div>`)}
+  ${step(2, S.checks.registre, r<1, "Registre des traitements", r<1 ? lockNote("Le registre généré automatiquement est inclus dans le plan Essentiel.","Essentiel") : `
+    <p class="muted" style="font-size:.88rem">Généré à partir de votre cartographie. Vérifiez chaque ligne avant de valider.</p>
+    <div class="tablewrap"><table><thead><tr><th>Traitement</th><th>Finalité</th><th>Données</th><th>Base légale</th><th>Conservation</th><th>Destinataires</th></tr></thead>
+    <tbody>${rows.map(d=>`<tr><td><strong>${d.tr}</strong></td><td>${d.fin}</td><td>${d.don}</td><td>${d.base}</td><td>${d.duree}</td><td>${d.dest}</td></tr>`).join("") || '<tr><td colspan="6">Aucune donnée cochée à l\'étape 1.</td></tr>'}</tbody></table></div>
+    <div class="row"><button class="btn ${S.checks.registre?'':'primary'}" data-act="check" data-v="registre" ${rows.length?"":"disabled"}>${S.checks.registre?"Registre validé":"Valider le registre"}</button></div>`)}
+  ${step(3, S.checks.decl, r<1, "Déclaration à l'APDP", r<1 ? lockNote("Le dossier de déclaration pré-rempli est inclus dans le plan Essentiel.","Essentiel") : `
+    <p class="muted" style="font-size:.88rem">Dossier pré-rempli. La déclaration doit être faite avant de commencer la collecte.</p>
+    <dl class="form"><dt>Responsable du traitement</dt><dd>${esc(c.name)}</dd><dt>RCCM</dt><dd class="num">${esc(c.rccm)}</dd><dt>Adresse</dt><dd>${esc(c.city)}</dd><dt>Contact</dt><dd>${esc(c.contact)}</dd>
+      <dt>Traitements déclarés</dt><dd>${rows.map(d=>d.tr).join(" ; ") || "Aucun"}</dd>
+      <dt>Mesures de sécurité</dt><dd>${measures().join(" ; ")}</dd></dl>
+    ${r>=2 ? `<div class="row"><button class="btn" data-act="tab" data-v="assistance">Me faire accompagner par mon partenaire</button></div>` : lockNote("L'accompagnement sur place par un partenaire est inclus dans le plan Premium.","Premium")}
+    <div class="row"><button class="btn ${S.checks.decl?'':'primary'}" data-act="check" data-v="decl">${S.checks.decl?"Déclaration déposée":"Marquer comme déposée"}</button></div>`)}
+  ${step(4, tpls.filter(t=>t.k!=="clause").every(t=>S.checks[t.k]), r<1, "Documents obligatoires", r<1 ? lockNote("Les modèles de documents sont inclus dans le plan Essentiel.","Essentiel") : `
+    <div class="tpls">${tpls.map(t=>`<div class="tpl"><div class="row"><h3>${t.t}</h3>${S.checks[t.k]?'<span class="pill t-good">En place</span>':''}</div><p class="muted" style="font-size:.85rem">${t.d}</p><div class="row"><button class="btn small" data-act="tpl" data-v="${t.k}">Ouvrir le modèle</button></div></div>`).join("")}</div>`)}
+  ${step(5, S.checks.fuite, r<1, "Procédure en cas de fuite", r<1 ? lockNote("La procédure de gestion des fuites est incluse dans le plan Essentiel.","Essentiel") : `
+    <ol class="plain"><li>Contenir : couper l'accès compromis, changer les mots de passe.</li><li>Évaluer : quelles données, combien de personnes, quel risque.</li><li>Informer la direction et noter l'incident dans le registre.</li><li>Prévenir l'APDP et les personnes concernées si le risque est important.</li><li>Corriger la cause et refaire le diagnostic Shield.</li></ol>
+    <div class="row"><button class="btn ${S.checks.fuite?'':'primary'}" data-act="check" data-v="fuite">${S.checks.fuite?"Procédure adoptée":"Adopter cette procédure"}</button></div>`)}
+  ${step(6, ks===100, false, "Sécurité des données", `
+    <p style="font-size:.9rem">${secOK() ? "Toutes les mesures de sécurité liées aux données personnelles sont en place." : `${dataQs().filter(q=>S.answers[q.id]!=="oui").length} mesure(s) de sécurité manquante(s) pour protéger les données personnelles.`}</p>
+    <div class="row"><button class="btn small" data-act="tabfilter" data-v="cyber">Voir les actions de sécurité</button></div>`)}
+  </ol>
+  <p class="foot">Prototype : les modèles juridiques seront relus par un juriste malien avant la mise en service. Shield aide à la mise en conformité et ne remplace pas un conseil juridique.</p>`;
+}
+
+/* ---------- Modèles de documents ---------- */
+function tplText(k){
+  const c = S.company, rows = registreRows();
+  const n = c.name || "[Nom de l'entreprise]";
+  if (k==="politique") return `POLITIQUE DE CONFIDENTIALITÉ — ${n}
+
+${n}, ${c.city}, RCCM ${c.rccm}, traite vos données personnelles conformément à la loi n° 2013-015 du 21 mai 2013 portant protection des données à caractère personnel.
+
+1. Données collectées et finalités
+${rows.map(d=>`• ${d.tr} : ${d.don.toLowerCase()}, pour ${d.fin.toLowerCase()}. Base : ${d.base.toLowerCase()}. Conservation : ${d.duree.toLowerCase()}.`).join("\n")}
+
+2. Destinataires
+Vos données ne sont communiquées qu'aux personnes qui en ont besoin : ${[...new Set(rows.map(d=>d.dest))].join(", ").toLowerCase()}. Elles ne sont jamais vendues.
+
+3. Sécurité
+Nous appliquons les mesures suivantes : ${measures().join(", ").toLowerCase()}.
+
+4. Vos droits
+Vous pouvez accéder à vos données, les faire rectifier ou supprimer, et vous opposer à leur traitement. Écrivez-nous à ${c.contact}.
+Vous pouvez aussi saisir l'Autorité de Protection des Données à caractère Personnel (APDP).
+
+Dernière mise à jour : ${new Date().toLocaleDateString("fr-FR")}`;
+  if (k==="consent") return `FORMULAIRE DE CONSENTEMENT — ${n}
+
+Je soussigné(e) : ______________________
+Téléphone : ______________________
+
+☐ J'accepte que ${n} conserve mon nom et mon numéro pour me contacter par WhatsApp ou SMS au sujet de mes commandes.
+☐ J'accepte de recevoir les offres et informations de ${n}.
+
+Je peux retirer mon consentement à tout moment en écrivant à ${c.contact} ou en répondant « STOP ».
+
+Fait à ${(c.city||"").split(",")[0]}, le ____ / ____ / ________
+
+Signature :`;
+  if (k==="camera") return `ZONE SOUS VIDÉOSURVEILLANCE
+
+Ces locaux sont placés sous vidéosurveillance pour la sécurité des personnes et des biens.
+
+Responsable : ${n}
+Durée de conservation des images : 30 jours
+Accès aux images : le gérant uniquement
+
+Pour exercer vos droits (accès, suppression) : ${c.contact}
+Loi n° 2013-015 du 21 mai 2013 — APDP`;
+  if (k==="clause") return `CLAUSE « DONNÉES PERSONNELLES » — CONTRAT DE TRAVAIL
+
+Le salarié est informé que ${n} traite ses données personnelles (identité, coordonnées, salaire, numéro INPS) pour la gestion du personnel, la paie et les déclarations sociales, conformément à la loi n° 2013-015 du 21 mai 2013.
+
+Ces données sont accessibles à la direction, au comptable et transmises à l'INPS. Elles sont conservées 5 ans après la fin du contrat.
+
+Le salarié peut accéder à ses données et en demander la rectification auprès de la direction.`;
+  return "";
+}
+const TPL_TITLES = {politique:"Politique de confidentialité", consent:"Formulaire de consentement", camera:"Affiche vidéosurveillance", clause:"Clause contrat de travail"};
+function openTpl(k){
+  const canMark = k !== "clause";
+  openModal(TPL_TITLES[k], `<pre class="doc" id="tpl-text">${esc(tplText(k))}</pre><p class="muted" style="font-size:.8rem">Modèle généré à partir de votre profil et de votre cartographie. À faire relire avant usage.</p>`,
+    `<button class="btn" data-act="copy">Copier le texte</button>${canMark?`<button class="btn primary" data-act="markdoc" data-v="${k}">${S.checks[k]?"Déjà en place":"Marquer comme mis en place"}</button>`:""}`);
+}
+
+/* ---------- Plans ---------- */
+function renderPlans(){
+  return `<div class="head"><div><span class="eyebrow">Abonnements</span><h1>Choisir un plan</h1></div></div>
+  <p class="muted" style="max-width:65ch">Payable par Orange Money ou Moov Money. Avec Premium, un partenaire de Shield au Mali (ISMACORP ou TEKNOFORCE) intervient dans vos locaux. Dans ce prototype, le paiement est simulé : aucun montant n'est débité.</p>
+  <div class="plans">${PLANS.map(p => {
+    const cur = p.id===S.plan;
+    return `<article class="card plan ${cur?'current':''}">
+      <div class="head"><h2>${p.name}</h2>${cur?'<span class="pill t-info">Plan actuel</span>':''}</div>
+      <div class="price">${p.price} <small>${p.per}</small></div>
+      <p class="muted" style="font-size:.88rem">${p.pitch}</p>
+      <ul>${p.feats.map(f=>`<li>${f}</li>`).join("")}</ul>
+      ${cur ? "" : UI.pay===p.id ? payPanel(p) : `<button class="btn ${p.rank>rank()?'primary':''}" data-act="choose" data-v="${p.id}">${p.id==="decouverte"?"Revenir au plan gratuit":"Choisir "+p.name}</button>`}
+    </article>`;}).join("")}</div>`;
+}
+function payPanel(p){
+  return `<div class="pay">${p.id==="premium" ? `<div class="field"><label for="pay-partner">Partenaire pour l'accompagnement</label><select id="pay-partner">${PARTNERS.map(x=>`<option value="${x.id}" ${x.id===S.partner?"selected":""}>${x.name} · ${x.tagline}</option>`).join("")}</select></div>` : ""}
+    <div class="field"><label for="pay-op">Opérateur</label><select id="pay-op"><option>Orange Money</option><option>Moov Money</option></select></div>
+    <div class="field"><label for="pay-num">Numéro de téléphone</label><input id="pay-num" inputmode="tel" placeholder="+223 7X XX XX XX"></div>
+    <div class="row"><button class="btn primary" data-act="pay" data-v="${p.id}">Payer ${p.price} FCFA (simulation)</button><button class="btn" data-act="cancelpay">Annuler</button></div></div>`;
+}
+
+/* ---------- Assistance et partenaires ---------- */
+const fmtDate = v => v ? new Date(v + "T12:00:00").toLocaleDateString("fr-FR") : "dès que possible";
+function partnerNeed(p){ const cats = CATS.filter(c => p.best.includes(c.id)); return cats.reduce((s,c) => s + (100 - catScore(c)), 0) / cats.length; }
+function partnerTeaser(){
+  const p = PARTNERS.find(x => x.id === S.partner);
+  const box = (title, body, btn) => `<section class="card"><div class="head"><div><span class="eyebrow">Accompagnement sur place</span><h2>${title}</h2></div>${btn}</div><p class="muted" style="font-size:.88rem">${body}</p></section>`;
+  if (rank() >= 2 && p){ const n = S.requests.filter(r => r.partner === p.id).length;
+    return box(p.name, `${n} demande${n>1?"s":""} d'intervention envoyée${n>1?"s":""}. Votre partenaire intervient dans vos locaux pour appliquer le plan d'action.`, `<button class="btn small" data-act="tab" data-v="assistance">${n ? "Suivre mes demandes" : "Demander une intervention"}</button>`); }
+  if (rank() >= 2) return box("Choisissez votre partenaire", "Votre plan Premium inclut l'intervention d'un expert partenaire dans vos locaux.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir</button>`);
+  return box("Un expert chez vous pour appliquer le plan", "Avec le plan Premium, ISMACORP ou TEKNOFORCE intervient dans vos locaux pour mettre en œuvre les actions.", `<button class="btn small" data-act="goplans">Voir Premium</button>`);
+}
+function renderAssistance(){
+  const r = rank();
+  const rec = [...PARTNERS].sort((a,b) => partnerNeed(b) - partnerNeed(a))[0].id;
+  const chosen = r >= 2 ? PARTNERS.find(p => p.id === S.partner) : null;
+  const support = r < 1 ? lockNote("Le support Shield 24h/24 et 7j/7 est inclus à partir du plan Essentiel.","Essentiel") : `
+    <div class="field"><label for="sp-subj">Sujet</label><select id="sp-subj"><option>Incident en cours (piratage, fraude, vol)</option><option>Question sur mon diagnostic</option><option>Aide pour la conformité APDP</option><option>Autre demande</option></select></div>
+    <div class="field"><label for="sp-msg">Votre message</label><textarea id="sp-msg" rows="3" placeholder="Décrivez la situation en quelques mots"></textarea></div>
+    <div class="row"><button class="btn primary" data-act="ticket">Envoyer au support</button></div>
+    ${S.tickets.length ? `<ul class="actions">${S.tickets.slice(-3).reverse().map(t => `<li class="action"><span class="stripe st-m3"></span><div class="body"><span class="title">${esc(t.subj)}</span><span class="muted" style="font-size:.8rem">${esc(t.date)} · ${esc(t.msg)}</span></div><span class="pill t-good">Reçu</span></li>`).join("")}</ul>` : ""}`;
+  const pcard = p => `<article class="partner ${chosen && chosen.id===p.id ? "chosen" : ""}">
+      <div class="head"><div><span class="eyebrow">${p.tagline} · ${p.city}</span><h3>${p.name}</h3></div>${p.id===rec ? '<span class="pill t-gold">Recommandé pour vos priorités</span>' : ""}</div>
+      <ul>${p.skills.map(s => `<li>${s}</li>`).join("")}</ul>
+      ${r < 2 ? "" : chosen && chosen.id===p.id ? '<span class="pill t-info" style="align-self:flex-start">Votre partenaire</span>'
+        : `<button class="btn small ${chosen ? "" : "primary"}" data-act="partner" data-v="${p.id}" style="align-self:flex-start">${chosen ? "Passer à ce partenaire" : "Choisir ce partenaire"}</button>`}
+    </article>`;
+  const open = actions().filter(a => !a.done).slice(0, 8);
+  const reqs = S.requests.slice().reverse();
+  const request = !chosen ? "" : `
+  <section class="card"><h2>Demander une intervention à ${chosen.name}</h2>
+    <p class="muted" style="font-size:.88rem">Cochez les actions à réaliser sur place. Shield transmet votre diagnostic au partenaire, qui vous contacte pour fixer le rendez-vous.</p>
+    <div class="picklist">${open.map(a => `<label class="chip"><input type="checkbox" id="rq-${a.id}" value="${esc(a.title)}" ${a.p==="urgent" ? "checked" : ""}><span>${esc(a.title)}</span></label>`).join("") || '<p class="muted">Aucune action ouverte.</p>'}</div>
+    <div class="field" style="max-width:240px"><label for="rq-date">Date souhaitée</label><input type="date" id="rq-date"></div>
+    <div class="field"><label for="rq-note">Précisions (adresse, horaires, contact sur place)</label><textarea id="rq-note" rows="2"></textarea></div>
+    <div class="row"><button class="btn primary" data-act="request">Envoyer la demande</button></div>
+    ${reqs.length ? `<h3>Mes demandes</h3><ul class="actions">${reqs.map(q => `<li class="action"><span class="stripe st-m1"></span><div class="body"><span class="title">${q.n} action${q.n>1?"s":""} · ${esc(q.partnerName)}</span><span class="muted" style="font-size:.8rem">Envoyée le ${esc(q.sent)} · souhaitée ${q.date.startsWith("dès") ? "" : "le "}${esc(q.date)}</span></div><span class="pill t-warn">À planifier</span></li>`).join("")}</ul>` : ""}
+  </section>`;
+  return `
+  <div class="head"><div><span class="eyebrow">Aide et experts</span><h1>Assistance</h1></div></div>
+  <section class="card"><div class="head"><div><h2>Support Shield</h2><span class="muted" style="font-size:.86rem">24h/24 et 7j/7, par message ou par téléphone</span></div>${r >= 1 ? '<span class="pill t-good">Inclus dans votre plan</span>' : ""}</div>${support}</section>
+  <section class="card"><div class="head"><div><h2>Accompagnement sur place</h2><span class="muted" style="font-size:.86rem">Nos partenaires au Mali interviennent dans vos locaux.${r >= 2 ? " La recommandation tient compte de vos catégories les plus faibles." : ""}</span></div>${r >= 2 ? '<span class="pill t-good">Inclus dans Premium</span>' : ""}</div>
+    ${r < 2 ? lockNote("L'accompagnement sur place par un partenaire est inclus dans le plan Premium.","Premium") : ""}
+    <div class="partners">${PARTNERS.map(pcard).join("")}</div></section>
+  ${request}`;
+}
+
+/* ---------- Accueil public, connexion, inscription ---------- */
+const backHome = `<button class="link" data-act="auth" data-v="landing" style="align-self:flex-start">← Retour à l'accueil</button>`;
+const authMsg = () => UI.authMsg ? `<p class="${UI.authMsg.t}" role="alert">${esc(UI.authMsg.m)}</p>` : "";
+function renderLanding(){
+  const feats = [["Diagnostic en 7 catégories","Accès, sauvegardes, postes, Wi-Fi, Mobile Money, site web et personnel."],
+                 ["Conformité APDP","Registre des traitements, dossier de déclaration, politique de confidentialité."],
+                 ["Experts sur place","ISMACORP et TEKNOFORCE accompagnent les clients Premium au Mali."]];
+  return `<div class="landing">
+    <div class="row" style="justify-content:space-between"><div class="brand big">${LOGO}Shield</div><button class="btn" data-act="auth" data-v="login">Se connecter</button></div>
+    <div class="strip" aria-hidden="true"></div>
+    <h1 class="hero">Protégez votre entreprise et mettez-vous en règle avec la loi sur les données personnelles.</h1>
+    <p class="lead">Shield évalue la cybersécurité de votre entreprise, vous donne un plan d'action clair et prépare les documents exigés par l'APDP (loi n° 2013-015 du 21 mai 2013).</p>
+    <div class="row"><button class="btn primary" data-act="auth" data-v="signup">Créer un compte gratuit</button><button class="btn" data-act="demo">Essayer la démo</button></div>
+    <div class="feats">${feats.map(([t,d]) => `<div class="feat"><h3>${t}</h3><p class="muted">${d}</p></div>`).join("")}</div>
+    <h2>Nos offres</h2>
+    <div class="plans">${PLANS.map(p => `<article class="card plan"><h2>${p.name}</h2><div class="price">${p.price} <small>${p.per}</small></div><p class="muted" style="font-size:.88rem">${p.pitch}</p><ul>${p.feats.map(f => `<li>${f}</li>`).join("")}</ul><button class="btn ${p.id==="essentiel" ? "primary" : ""}" data-act="auth" data-v="signup" data-plan="${p.id}" style="margin-top:auto">Commencer</button></article>`).join("")}</div>
+  </div>`;
+}
+function renderLogin(){
+  return `<div class="auth"><div class="brand big">${LOGO}Shield</div>
+    <form class="card" data-form="login" novalidate><h1>Se connecter</h1>${authMsg()}
+      <div class="field"><label for="li-email">Email</label><input id="li-email" type="email" autocomplete="username" value="${esc(UI.lastEmail || "")}"></div>
+      <div class="field"><label for="li-pw">Mot de passe</label><input id="li-pw" type="password" autocomplete="current-password"></div>
+      <button class="link" type="button" data-act="forgot" style="align-self:flex-start">Mot de passe oublié ?</button>
+      <button class="btn primary" type="submit">Se connecter</button>
+      <p class="muted" style="font-size:.88rem">Pas encore de compte ? <button class="link" type="button" data-act="auth" data-v="signup">Créer un compte</button></p>
+      <p class="muted" style="font-size:.8rem">Compte de démonstration : ${DEMO} · ${DEMO_PW}</p>
+    </form>${backHome}</div>`;
+}
+function renderSignup(){
+  const d = UI.draft || {};
+  const f = (id, l, type, ac, ph, v="") => `<div class="field"><label for="su-${id}">${l}</label><input id="su-${id}" type="${type}" autocomplete="${ac}" placeholder="${ph}" value="${esc(v)}"></div>`;
+  const plan = d.plan || UI.signupPlan || "decouverte";
+  return `<div class="auth wide"><div class="brand big">${LOGO}Shield</div>
+    <form class="card" data-form="signup" novalidate><h1>Créer un compte</h1>${authMsg()}
+      <h3>Vous</h3>
+      ${f("name","Nom et prénom","text","name","Ex. Aminata Coulibaly",d.name)}
+      <div class="two">${f("email","Email","email","email","vous@entreprise.ml",d.email)}${f("phone","Téléphone","tel","tel","+223 7X XX XX XX",d.phone)}</div>
+      <div class="two">${f("pw","Mot de passe (8 caractères min.)","password","new-password","")}${f("pw2","Confirmer le mot de passe","password","new-password","")}</div>
+      <h3>Votre entreprise</h3>
+      ${f("company","Nom de l'entreprise","text","organization","Ex. Boutique Diarra",d.company)}
+      <div class="two">${f("sector","Secteur","text","off","Ex. Pharmacie, école, hôtel",d.sector)}${f("city","Ville et quartier","text","address-level2","Ex. Bamako, Hamdallaye",d.city)}</div>
+      <div class="two">${f("staff","Nombre d'employés","number","off","Ex. 8",d.staff)}${f("rccm","Numéro RCCM (facultatif)","text","off","MA.BKO.AAAA.X.XXXX",d.rccm)}</div>
+      <div class="field"><label for="su-plan">Offre</label><select id="su-plan">${PLANS.map(p => `<option value="${p.id}" ${p.id===plan ? "selected" : ""}>${p.name} · ${p.price}${p.per ? " " + p.per : ""}</option>`).join("")}</select></div>
+      <label class="chip" style="align-items:flex-start"><input type="checkbox" id="su-cgu" ${d.cgu ? "checked" : ""}><span>J'accepte les conditions d'utilisation et la politique de confidentialité de Shield.</span></label>
+      <button class="btn primary" type="submit">Créer mon compte</button>
+      <p class="muted" style="font-size:.88rem">Déjà inscrit ? <button class="link" type="button" data-act="auth" data-v="login">Se connecter</button></p>
+    </form>${backHome}</div>`;
+}
+async function doSignup(){
+  const g = id => $("su-" + id).value.trim();
+  const d = {name:g("name"), email:g("email").toLowerCase(), phone:g("phone"), company:g("company"), sector:g("sector"), city:g("city"), staff:g("staff"), rccm:g("rccm"), plan:$("su-plan").value, cgu:$("su-cgu").checked};
+  UI.draft = d;
+  const pw = $("su-pw").value, pw2 = $("su-pw2").value;
+  const err = !d.name ? "Indiquez votre nom et prénom."
+    : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email) ? "Saisissez une adresse email valide."
+    : (DB.users[d.email] || d.email === DEMO) ? "Un compte existe déjà avec cet email. Connectez-vous."
+    : pw.length < 8 ? "Le mot de passe doit contenir au moins 8 caractères."
+    : pw !== pw2 ? "Les deux mots de passe ne correspondent pas."
+    : !d.company ? "Indiquez le nom de votre entreprise."
+    : !d.cgu ? "Acceptez les conditions d'utilisation pour continuer." : "";
+  if (err){ UI.authMsg = {t:"err", m:err}; render(); window.scrollTo(0,0); return; }
+  const st = newState({name:d.company, city:d.city || "Mali", sector:d.sector || "Secteur non précisé", staff:d.staff || "?", rccm:d.rccm || "À compléter", contact:d.email});
+  DB.users[d.email] = {name:d.name, email:d.email, phone:d.phone, hash:await hash(pw, d.email), created:new Date().toISOString(), state:st};
+  DB.session = d.email; S = st; UI.draft = null; UI.authMsg = null; UI.signupPlan = null;
+  if (d.plan !== "decouverte"){ S.tab = "plans"; UI.pay = d.plan; }
+  save(); render(); window.scrollTo(0,0);
+  toast(d.plan !== "decouverte" ? "Compte créé. Finalisez le paiement de votre offre." : `Compte créé. Bienvenue, ${firstName(d.name)}.`);
+}
+async function doLogin(){
+  const email = $("li-email").value.trim().toLowerCase(), pw = $("li-pw").value;
+  UI.lastEmail = email;
+  if (!email || !pw){ UI.authMsg = {t:"err", m:"Saisissez votre email et votre mot de passe."}; render(); return; }
+  if (email === DEMO && pw === DEMO_PW) return doDemo();
+  const u = DB.users[email];
+  if (!u || u.hash !== await hash(pw, email)){ UI.authMsg = {t:"err", m:"Email ou mot de passe incorrect."}; render(); return; }
+  DB.session = email; S = migrate(u.state); S.tab = "tableau"; u.state = S; UI.authMsg = null;
+  save(); render(); window.scrollTo(0,0); toast(`Bienvenue, ${firstName(u.name)}.`);
+}
+async function doDemo(){
+  DB.users[DEMO] = {name:"Awa Kanté", email:DEMO, phone:"+223 70 00 00 00", hash:await hash(DEMO_PW, DEMO), created:new Date().toISOString(), state:sampleState()};
+  DB.session = DEMO; S = DB.users[DEMO].state; UI.authMsg = null;
+  save(); render(); window.scrollTo(0,0); toast("Vous êtes sur le compte de démonstration.");
+}
+function logout(msg){
+  DB.session = null; S = null; Object.assign(UI, {auth:"landing", pay:null, authMsg:null, confirmDelete:false, confirmRestart:false, showDone:false});
+  persist(); closeModal(); render(); window.scrollTo(0,0); toast(msg || "Vous êtes déconnecté.");
+}
+function migrate(st){
+  if (!PLANS.some(p => p.id === st.plan)) st.plan = "essentiel";
+  st.tickets = st.tickets || []; st.requests = st.requests || []; if (!("partner" in st)) st.partner = null;
+  if (![...TABS.map(t => t[0]), "compte"].includes(st.tab)) st.tab = "tableau";
+  if (!["intro","questions","rapport"].includes(st.diagView)) st.diagView = "intro";
+  return st;
+}
+
+/* ---------- Mon compte ---------- */
+function renderCompte(){
+  const me = ME(), c = S.company, p = PLANS.find(x => x.id === S.plan);
+  const f = (id, l, v, type="text", extra="") => `<div class="field"><label for="ac-${id}">${l}</label><input id="ac-${id}" type="${type}" value="${esc(v)}" ${extra}></div>`;
+  const partner = S.plan === "premium" && S.partner ? PARTNERS.find(x => x.id === S.partner) : null;
+  return `<div class="head"><div><span class="eyebrow">Paramètres</span><h1>Mon compte</h1></div><button class="btn" data-act="logout">Se déconnecter</button></div>
+  <div class="grid2">
+    <section class="card"><h2>Mes informations</h2>${f("name","Nom et prénom",me.name,"text",'autocomplete="name"')}${f("email","Email",me.email,"email","readonly")}${f("phone","Téléphone",me.phone,"tel",'autocomplete="tel"')}
+      <div class="row"><button class="btn primary" data-act="saveme">Enregistrer</button></div></section>
+    <section class="card"><h2>Mon entreprise</h2>${f("company","Nom de l'entreprise",c.name)}${f("sector","Secteur",c.sector)}${f("city","Ville et quartier",c.city)}
+      <div class="two">${f("staff","Employés",c.staff,"number")}${f("rccm","RCCM",c.rccm)}</div>${f("contact","Contact affiché sur vos documents",c.contact)}
+      <div class="row"><button class="btn primary" data-act="savecompany">Enregistrer</button></div></section>
+    <section class="card"><h2>Mot de passe</h2>${f("pw0","Mot de passe actuel","","password",'autocomplete="current-password"')}${f("pw1","Nouveau mot de passe","","password",'autocomplete="new-password"')}${f("pw2","Confirmer le nouveau mot de passe","","password",'autocomplete="new-password"')}
+      <div class="row"><button class="btn" data-act="changepw">Changer le mot de passe</button></div></section>
+    <section class="card"><h2>Abonnement</h2><p><strong>${p.name}</strong> · ${p.price} ${p.per}</p>${partner ? `<p class="muted">Partenaire : ${partner.name}</p>` : ""}
+      <p class="muted" style="font-size:.86rem">Membre depuis le ${new Date(me.created).toLocaleDateString("fr-FR")}</p>
+      <div class="row"><button class="btn" data-act="tab" data-v="plans">Changer de plan</button></div></section>
+  </div>
+  <section class="card danger"><h2>Se désinscrire</h2>
+    <p class="muted" style="max-width:65ch">La suppression du compte efface définitivement votre diagnostic, votre plan d'action, vos documents de conformité et vos demandes d'intervention.${S.plan !== "decouverte" ? " Votre abonnement est résilié." : ""}</p>
+    ${UI.confirmDelete
+      ? `<div class="field" style="max-width:320px"><label for="ac-delpw">Confirmez avec votre mot de passe</label><input id="ac-delpw" type="password" autocomplete="current-password"></div>
+         <div class="row"><button class="btn danger-btn" data-act="deleteacc">Supprimer définitivement mon compte</button><button class="btn" data-act="canceldelete">Annuler</button></div>`
+      : `<div class="row"><button class="btn danger-outline" data-act="askdelete">Supprimer mon compte</button></div>`}
+  </section>`;
+}
+async function changePw(){
+  const me = ME(), cur = $("ac-pw0").value, n1 = $("ac-pw1").value, n2 = $("ac-pw2").value;
+  if (me.hash !== await hash(cur, me.email)){ toast("Le mot de passe actuel est incorrect."); $("ac-pw0").focus(); return; }
+  if (n1.length < 8){ toast("Le nouveau mot de passe doit contenir au moins 8 caractères."); $("ac-pw1").focus(); return; }
+  if (n1 !== n2){ toast("Les deux nouveaux mots de passe ne correspondent pas."); $("ac-pw2").focus(); return; }
+  me.hash = await hash(n1, me.email); save(); render(); toast("Mot de passe modifié.");
+}
+async function deleteAccount(){
+  const me = ME(), pw = $("ac-delpw").value;
+  if (me.hash !== await hash(pw, me.email)){ toast("Mot de passe incorrect. Le compte n'a pas été supprimé."); $("ac-delpw").focus(); return; }
+  delete DB.users[me.email];
+  logout("Votre compte a été supprimé.");
+}
+
+/* ---------- Profil ---------- */
+function openProfile(){
+  const c = S.company, f = (id,l,v,ph) => `<div class="field"><label for="pf-${id}">${l}</label><input id="pf-${id}" value="${esc(v)}" placeholder="${ph}"></div>`;
+  openModal("Profil de l'entreprise", `<div style="display:flex;flex-direction:column;gap:10px">
+    ${f("name","Nom de l'entreprise",S.sample?"":c.name,"Ex. Boutique Diarra")}
+    ${f("city","Ville et quartier",S.sample?"":c.city,"Ex. Bamako, Hamdallaye")}
+    ${f("sector","Secteur",S.sample?"":c.sector,"Ex. Pharmacie, école privée, hôtel")}
+    ${f("staff","Nombre d'employés",S.sample?"":c.staff,"Ex. 8")}
+    ${f("rccm","Numéro RCCM",S.sample?"":c.rccm,"MA.BKO.AAAA.X.XXXX")}
+    ${f("contact","Email ou téléphone de contact",S.sample?"":c.contact,"Ex. contact@monentreprise.ml")}</div>`,
+    `<button class="btn" data-act="close">Annuler</button><button class="btn primary" data-act="saveprofile">Enregistrer</button>`);
+}
+
+/* ---------- Fenêtre ---------- */
+function openModal(title, body, foot){
+  $("overlay").innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title"><header><h2 id="m-title">${title}</h2><button class="btn small" data-act="close" aria-label="Fermer">Fermer</button></header><div class="mbody">${body}</div><footer>${foot}</footer></div>`;
+  $("overlay").hidden = false;
+}
+const closeModal = () => { $("overlay").hidden = true; $("overlay").innerHTML = ""; };
+
+/* ---------- Rendu ---------- */
+function render(){
+  document.body.classList.toggle("out", !S);
+  if (!S){ $("main").innerHTML = ({landing:renderLanding, login:renderLogin, signup:renderSignup}[UI.auth] || renderLanding)(); return; }
+  renderShell();
+  $("main").innerHTML = ({tableau:renderTableau, diagnostic:renderDiagnostic, conformite:renderConformite, assistance:renderAssistance, plans:renderPlans, compte:renderCompte}[S.tab] || renderTableau)();
+}
+function go(tab){ S.tab = tab; UI.pay = null; save(); render(); window.scrollTo(0,0); }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act, v = b.dataset.v;
+  if (b.type === "checkbox") return;
+  switch(act){
+    case "auth": UI.auth = v; UI.authMsg = null; if (b.dataset.plan) UI.signupPlan = b.dataset.plan; render(); window.scrollTo(0,0); break;
+    case "demo": doDemo(); break;
+    case "forgot": UI.authMsg = {t:"info-msg", m:"Dans la version finale, un lien de réinitialisation est envoyé à votre adresse email."}; render(); break;
+    case "logout": logout(); break;
+    case "saveme": {
+      const n = $("ac-name").value.trim(); if (!n){ toast("Indiquez votre nom."); $("ac-name").focus(); break; }
+      ME().name = n; ME().phone = $("ac-phone").value.trim(); save(); render(); toast("Informations enregistrées."); break; }
+    case "savecompany": {
+      const g = id => $("ac-" + id).value.trim();
+      if (!g("company")){ toast("Indiquez le nom de l'entreprise."); $("ac-company").focus(); break; }
+      S.company = {name:g("company"), sector:g("sector") || "Secteur non précisé", city:g("city") || "Mali", staff:g("staff") || "?", rccm:g("rccm") || "À compléter", contact:g("contact") || ME().email};
+      save(); render(); toast("Entreprise enregistrée. Vos documents sont mis à jour."); break; }
+    case "changepw": changePw(); break;
+    case "askdelete": UI.confirmDelete = true; render(); $("ac-delpw").focus(); break;
+    case "canceldelete": UI.confirmDelete = false; render(); break;
+    case "deleteacc": deleteAccount(); break;
+    case "startdiag": {
+      const i = CATS.findIndex(c => catAnswered(c) < availQs(c).length);
+      S.tab = "diagnostic"; S.diagView = "questions"; S.diagCat = i < 0 ? 0 : i; save(); render(); window.scrollTo(0,0); break; }
+    case "askrestart": UI.confirmRestart = true; render(); break;
+    case "cancelrestart": UI.confirmRestart = false; render(); break;
+    case "restart":
+      UI.confirmRestart = false; S.answers = {}; Object.keys(S.statuses).filter(k => k.startsWith("q-")).forEach(k => delete S.statuses[k]);
+      S.diagView = "questions"; S.diagCat = 0; save(); render(); toast("Nouveau diagnostic démarré."); break;
+    case "tab": go(v); break;
+    case "goplans": closeModal(); go("plans"); break;
+    case "filter": S.filter = v; save(); render(); break;
+    case "tabfilter": S.filter = v; go("tableau"); break;
+    case "showdone": UI.showDone = !UI.showDone; render(); break;
+    case "dview": S.diagView = v; save(); render(); window.scrollTo(0,0); break;
+    case "cat": S.diagCat = +v; S.diagView="questions"; save(); render(); break;
+    case "ans": S.answers[b.dataset.q] = v; delete S.statuses["q-"+b.dataset.q]; save(); render(); break;
+    case "cycle": {
+      const a = actions().find(x => x.id===v); const cur = statusOf(a);
+      const next = {todo:"doing", doing:"done", done:"todo"}[cur];
+      const [kind, key] = [v.slice(0,1), v.slice(2)];
+      if (next==="done"){ kind==="q" ? S.answers[key]="oui" : S.checks[key]=true; toast("Action terminée. Score mis à jour."); }
+      if (cur==="done"){ kind==="q" ? S.answers[key]="non" : S.checks[key]=false; }
+      S.statuses[v] = next; save(); render(); break; }
+    case "check": S.checks[v] = !S.checks[v]; save(); render(); break;
+    case "tpl": openTpl(v); break;
+    case "markdoc": S.checks[v] = true; save(); closeModal(); render(); toast("Document marqué comme mis en place."); break;
+    case "copy": {
+      const txt = $("tpl-text").textContent;
+      const fallback = () => { const r=document.createRange(); r.selectNodeContents($("tpl-text")); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast("Texte sélectionné : copiez-le manuellement."); };
+      try { navigator.clipboard.writeText(txt).then(()=>toast("Texte copié."), fallback); } catch(err){ fallback(); }
+      break; }
+    case "pdf": if (!UI.pdfBusy) downloadReport(); break;
+    case "ticket": {
+      const msg = $("sp-msg").value.trim();
+      if (!msg){ toast("Écrivez votre message avant de l'envoyer."); $("sp-msg").focus(); break; }
+      S.tickets.push({subj:$("sp-subj").value, msg, date:new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})});
+      save(); render(); toast("Message envoyé au support Shield (simulation)."); break; }
+    case "partner": S.partner = v; save(); render(); toast(`${PARTNERS.find(p=>p.id===v).name} est votre partenaire.`); break;
+    case "request": {
+      const picked = [...document.querySelectorAll(".picklist input:checked")];
+      if (!picked.length){ toast("Cochez au moins une action à réaliser sur place."); break; }
+      const p = PARTNERS.find(x => x.id === S.partner);
+      S.requests.push({partner:p.id, partnerName:p.name, n:picked.length, actions:picked.map(i=>i.value), date:fmtDate($("rq-date").value), note:$("rq-note").value.trim(), sent:new Date().toLocaleDateString("fr-FR")});
+      save(); render(); toast(`Demande envoyée à ${p.name} (simulation).`); break; }
+    case "choose": if (v==="decouverte"){ S.plan=v; save(); render(); toast("Plan Découverte activé."); } else { UI.pay=v; render(); } break;
+    case "cancelpay": UI.pay=null; render(); break;
+    case "pay": {
+      const num = ($("pay-num").value||"").replace(/\s/g,"");
+      if (num.replace(/\D/g,"").length < 8){ toast("Saisissez un numéro de téléphone valide (8 chiffres au moins)."); $("pay-num").focus(); break; }
+      if (v === "premium") S.partner = $("pay-partner").value;
+      S.plan = v; UI.pay=null; save(); render(); toast(`Plan ${planName()} activé (paiement simulé).`); break; }
+    case "profile": openProfile(); break;
+    case "saveprofile": {
+      const g = id => $("pf-"+id).value.trim();
+      if (!g("name")){ toast("Indiquez le nom de l'entreprise."); $("pf-name").focus(); break; }
+      S.company = {name:g("name"), city:g("city")||"Mali", sector:g("sector")||"Secteur non précisé", staff:g("staff")||"?", rccm:g("rccm")||"À compléter", contact:g("contact")||"À compléter"};
+      if (S.sample){ S.sample=false; S.answers={}; S.checks={}; S.statuses={}; S.data={clients:true}; S.diagCat=0; }
+      save(); closeModal(); render(); toast("Profil enregistré. Lancez votre diagnostic."); break; }
+    case "close": closeModal(); break;
+    case "askreset": UI.confirmReset=true; render(); break;
+    case "cancelreset": UI.confirmReset=false; render(); break;
+    case "reset": UI.confirmReset=false; S.answers={}; S.checks={}; S.statuses={}; S.tickets=[]; S.requests=[]; S.data={clients:true}; S.sample=false; S.diagCat=0; save(); render(); toast("Réponses effacées."); break;
+    case "loadsample": S = sampleState(); save(); render(); toast("Exemple rechargé."); break;
+  }
+});
+document.addEventListener("submit", e => {
+  const f = e.target.closest("[data-form]"); if (!f) return;
+  e.preventDefault();
+  f.dataset.form === "login" ? doLogin() : doSignup();
+});
+document.addEventListener("change", e => {
+  const b = e.target.closest('[data-act="dtype"]'); if (!b) return;
+  S.data[b.dataset.v] = b.checked; S.checks.registre = false; save(); render();
+});
+$("overlay").addEventListener("click", e => { if (e.target.id==="overlay") closeModal(); });
+document.addEventListener("keydown", e => { if (e.key==="Escape" && !$("overlay").hidden) closeModal(); });
+
+if (ME()) { S = migrate(ME().state); ME().state = S; }
+const h = (location.hash||"").slice(1);
+if (S && [...TABS.map(t => t[0]), "compte"].includes(h)) S.tab = h;
+render();
+(async () => {
+  try { UI.dl = (window.claude && typeof window.claude.use === "function") ? await window.claude.use("downloads") : null; }
+  catch(e){ UI.dl = null; }
+  if (!UI.dl) UI.dl = { save: async ({filename, data}) => {
+    const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data]));
+    const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000); return {status:"saved"}; } };
+  if (UI.dl && S && S.tab === "diagnostic" && S.diagView === "rapport") render();
+})();
+</script>
+
+</body>
+</html>
