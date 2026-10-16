@@ -333,10 +333,6 @@ const PLANS = [
   {id:"essentiel", rank:1, name:"Essentiel", price:"50 000", per:"FCFA / mois", pitch:"Pour sécuriser son entreprise et se mettre en règle.",
    feats:["Tout le plan Découverte","Plan d'action priorisé","Module conformité : registre, dossier APDP, modèles de documents","Support Shield 24h/24 et 7j/7","Demandes de devis auprès de SWA Tech (diagnostic personnalisé, accompagnement sur place)"]}
 ];
-const PARTNERS = [
-  {id:"ismacorp", name:"ISMACORP", city:"Bamako"},
-  {id:"teknoforce", name:"TEKNOFORCE SARL", city:"Bamako"}
-];
 const SWA = {name:"SWA Tech", phone:"+33 6 88 78 26 28", email:"contact@swa-tech.fr", site:"https://www.swa-tech.fr/", siteLabel:"www.swa-tech.fr"};
 function swaBlock(intro){
   return `<div class="swa">${intro ? `<p style="margin:0">${intro}</p>` : ""}
@@ -814,7 +810,7 @@ function quoteServices(){
   ${swaBlock("Pour un devis, contactez SWA Tech :")}`;
 }
 function payPanel(p){
-  return `<div class="pay">${false ? `<div class="field"><label for="pay-partner">Partenaire souhaité pour l'accompagnement (sur devis)</label><select id="pay-partner">${PARTNERS.map(x=>`<option value="${x.id}" ${x.id===S.partner?"selected":""}>${x.name}</option>`).join("")}</select></div>` : ""}
+  return `<div class="pay">
     <div class="field"><label for="pay-op">Opérateur</label><select id="pay-op"><option>Orange Money</option><option>Moov Money</option></select></div>
     <div class="field"><label for="pay-num">Numéro de téléphone</label><input id="pay-num" inputmode="tel" placeholder="+223 7X XX XX XX"></div>
     <div class="row"><button class="btn primary" data-act="pay" data-v="${p.id}">Payer ${p.price} FCFA (simulation)</button><button class="btn" data-act="cancelpay">Annuler</button></div></div>`;
@@ -823,46 +819,36 @@ function payPanel(p){
 /* ---------- Assistance et partenaires ---------- */
 const fmtDate = v => v ? new Date(v + "T12:00:00").toLocaleDateString("fr-FR") : "dès que possible";
 function partnerTeaser(){
-  const p = PARTNERS.find(x => x.id === S.partner);
   const box = (title, body, btn) => `<section class="card"><div class="head"><div><span class="eyebrow">Accompagnement sur place · sur devis</span><h2>${title}</h2></div>${btn}</div><p class="muted" style="font-size:.88rem">${body}</p></section>`;
-  if (rank() >= 1 && p){ const n = S.requests.filter(r => r.partner === p.id).length;
-    return box(p.name, `${n} demande${n>1?"s":""} envoyée${n>1?"s":""} à SWA Tech, qui organise l'intervention avec ${p.name} et vous adresse un devis.`, `<button class="btn small" data-act="tab" data-v="assistance">${n ? "Suivre mes demandes" : "Faire une demande"}</button>`); }
-  if (rank() >= 1) return box("Faites intervenir un expert chez vous", "Votre abonnement vous permet de demander l'accompagnement sur place d'un partenaire, sur devis. La demande passe par SWA Tech.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir un partenaire</button>`);
+  const n = (S.requests || []).length;
+  if (rank() >= 1 && n) return box("Vos demandes d'accompagnement", `${n} demande${n>1?"s":""} envoyée${n>1?"s":""}. Nous vous adressons un devis avant toute intervention.`, `<button class="btn small" data-act="tab" data-v="assistance">Suivre mes demandes</button>`);
+  if (rank() >= 1) return box("Faites intervenir un expert chez vous", "Votre abonnement vous permet de demander l'accompagnement sur place de nos experts, sur devis.", `<button class="btn small primary" data-act="tab" data-v="assistance">Faire une demande</button>`);
   return box("Un expert chez vous pour appliquer le plan", "Avec l'abonnement Essentiel, nos experts peuvent intervenir dans vos locaux, sur devis via SWA Tech.", `<button class="btn small" data-act="goplans">Voir l'abonnement</button>`);
 }
 function renderAssistance(){
   const r = rank();
-  const chosen = r >= 1 ? PARTNERS.find(p => p.id === S.partner) : null;
   const support = r < 1 ? lockNote("Le support Shield 24h/24 et 7j/7 est inclus à partir du plan Essentiel.","Essentiel") : `
     <div class="field"><label for="sp-subj">Sujet</label><select id="sp-subj"><option>Incident en cours (piratage, fraude, vol)</option><option>Question sur mon diagnostic</option><option>Aide pour la conformité APDP</option><option>Autre demande</option></select></div>
     <div class="field"><label for="sp-msg">Votre message</label><textarea id="sp-msg" rows="3" placeholder="Décrivez la situation en quelques mots"></textarea></div>
     <div class="row"><button class="btn primary" data-act="ticket">Envoyer au support</button></div>
     ${S.tickets.length ? `<ul class="actions">${S.tickets.slice(-3).reverse().map(t => `<li class="action"><span class="stripe st-m3"></span><div class="body"><span class="title">${esc(t.subj)}</span><span class="muted" style="font-size:.8rem">${esc(t.date)} · ${esc(t.msg)}</span></div><span class="pill t-good">Reçu</span></li>`).join("")}</ul>` : ""}`;
-  const pcard = p => {
-    const sel = chosen && chosen.id === p.id;
-    return `<article class="partner ${sel ? "chosen" : ""}">
-      <div class="head"><div><span class="eyebrow">Partenaire · ${p.city}</span><h3>${p.name}</h3></div>${sel ? '<span class="pill t-info">Sélectionné</span>' : ""}</div>
-      ${r >= 1 && !sel ? `<button class="btn small primary" data-act="partner" data-v="${p.id}" style="align-self:flex-start">Demander un accompagnement</button>` : ""}
-    </article>`; };
   const open = actions().filter(a => !a.done).slice(0, 8);
   const reqs = S.requests.slice().reverse();
-  const request = !chosen ? "" : `
-  <section class="card"><h2>Demande d'accompagnement avec ${chosen.name}</h2>
-    <p class="muted" style="font-size:.88rem">Votre demande est envoyée à SWA Tech. SWA Tech vous adresse un devis, puis contacte ${chosen.name} pour organiser l'intervention dans vos locaux.</p>
+  const request = r < 1 ? "" : `
+    <h3>Votre demande</h3>
+    <p class="muted" style="font-size:.88rem">Cochez les actions à réaliser sur place et précisez votre besoin. Nous vous adressons un devis, puis un expert intervient dans vos locaux.</p>
     <div class="picklist">${open.map(a => `<label class="chip"><input type="checkbox" id="rq-${a.id}" value="${esc(a.title)}" ${a.p==="urgent" ? "checked" : ""}><span>${esc(a.title)}</span></label>`).join("") || '<p class="muted">Aucune action ouverte.</p>'}</div>
     <div class="field" style="max-width:240px"><label for="rq-date">Date souhaitée</label><input type="date" id="rq-date"></div>
     <div class="field"><label for="rq-note">Précisions (adresse, horaires, contact sur place)</label><textarea id="rq-note" rows="2"></textarea></div>
     <div class="row"><button class="btn primary" data-act="request">Envoyer la demande</button></div>
-    ${reqs.length ? `<h3>Mes demandes</h3><ul class="actions">${reqs.map(q => `<li class="action"><span class="stripe st-m1"></span><div class="body"><span class="title">${q.n} action${q.n>1?"s":""} · ${esc(q.partnerName)}</span><span class="muted" style="font-size:.8rem">Transmise à SWA Tech le ${esc(q.sent)} · souhaitée ${q.date.startsWith("dès") ? "" : "le "}${esc(q.date)}</span></div><span class="pill t-warn">Devis en attente</span></li>`).join("")}</ul>` : ""}
-  </section>`;
+    ${reqs.length ? `<h3>Mes demandes</h3><ul class="actions">${reqs.map(q => `<li class="action"><span class="stripe st-m1"></span><div class="body"><span class="title">Accompagnement sur place · ${q.n} action${q.n>1?"s":""}</span><span class="muted" style="font-size:.8rem">Envoyée le ${esc(q.sent)} · souhaitée ${q.date.startsWith("dès") ? "" : "le "}${esc(q.date)}</span></div><span class="pill t-warn">Devis en attente</span></li>`).join("")}</ul>` : ""}`;
   return `
   <div class="head"><div><span class="eyebrow">Aide et experts</span><h1>Assistance</h1></div></div>
   <section class="card"><div class="head"><div><h2>Support Shield</h2><span class="muted" style="font-size:.86rem">24h/24 et 7j/7, par message ou par téléphone</span></div>${r >= 1 ? '<span class="pill t-good">Inclus dans votre plan</span>' : ""}</div>${support}</section>
   <section class="card"><div class="head"><div><h2>Diagnostic personnalisé</h2></div><span class="pill t-gold">Sur devis</span></div>${swaBlock(SWA_SENTENCE)}</section>
-  <section class="card"><div class="head"><div><h2>Accompagnement sur place</h2><span class="muted" style="font-size:.86rem">Nos partenaires au Mali interviennent dans vos locaux, sur devis.</span></div><span class="pill t-gold">Sur devis</span></div>
+  <section class="card"><div class="head"><div><h2>Accompagnement sur place</h2><span class="muted" style="font-size:.86rem">Nos experts interviennent dans vos locaux pour mettre en œuvre votre plan d'action, sur devis.</span></div><span class="pill t-gold">Sur devis</span></div>
     ${r < 1 ? lockNote("Les demandes de devis sont accessibles avec l'abonnement Essentiel.","Essentiel") : ""}
-    <div class="partners">${PARTNERS.map(pcard).join("")}</div></section>
-  ${request}`;
+    ${request}</section>`;
 }
 
 /* ---------- Accueil public, connexion, inscription ---------- */
@@ -966,7 +952,7 @@ function migrate(st){
 function renderCompte(){
   const me = ME(), c = S.company, p = PLANS.find(x => x.id === S.plan);
   const f = (id, l, v, type="text", extra="") => `<div class="field"><label for="ac-${id}">${l}</label><input id="ac-${id}" type="${type}" value="${esc(v)}" ${extra}></div>`;
-  const partner = S.plan !== "decouverte" && S.partner ? PARTNERS.find(x => x.id === S.partner) : null;
+  const partner = null;
   return `<div class="head"><div><span class="eyebrow">Paramètres</span><h1>Mon compte</h1></div><button class="btn" data-act="logout">Se déconnecter</button></div>
   <div class="grid2">
     <section class="card"><h2>Mes informations</h2>${f("name","Nom et prénom",me.name,"text",'autocomplete="name"')}${f("email","Email",me.email,"email","readonly")}${f("phone","Téléphone",me.phone,"tel",'autocomplete="tel"')}
@@ -1089,7 +1075,6 @@ document.addEventListener("click", e => {
       if (!msg){ toast("Écrivez votre message avant de l'envoyer."); $("sp-msg").focus(); break; }
       S.tickets.push({subj:$("sp-subj").value, msg, date:new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})});
       save(); render(); toast("Message envoyé au support Shield (simulation)."); break; }
-    case "partner": S.partner = v; save(); render(); toast(`${PARTNERS.find(p=>p.id===v).name} sélectionné. Complétez votre demande.`); break;
     case "copytxt": {
       const done = () => toast("Copié.");
       try { navigator.clipboard.writeText(v).then(done, () => toast(v)); } catch(err){ toast(v); }
@@ -1097,8 +1082,7 @@ document.addEventListener("click", e => {
     case "request": {
       const picked = [...document.querySelectorAll(".picklist input:checked")];
       if (!picked.length){ toast("Cochez au moins une action à réaliser sur place."); break; }
-      const p = PARTNERS.find(x => x.id === S.partner);
-      S.requests.push({partner:p.id, partnerName:p.name, n:picked.length, actions:picked.map(i=>i.value), date:fmtDate($("rq-date").value), note:$("rq-note").value.trim(), sent:new Date().toLocaleDateString("fr-FR")});
+      S.requests.push({n:picked.length, actions:picked.map(i=>i.value), date:fmtDate($("rq-date").value), note:$("rq-note").value.trim(), sent:new Date().toLocaleDateString("fr-FR")});
       save(); render(); toast("Demande envoyée à SWA Tech (simulation)."); break; }
     case "choose": if (v==="decouverte"){ S.plan=v; save(); render(); toast("Plan Découverte activé."); } else { UI.pay=v; render(); } break;
     case "cancelpay": UI.pay=null; render(); break;
