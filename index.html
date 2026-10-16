@@ -179,8 +179,7 @@ ol.plain{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;f
 
 /* Plans */
 .plans{display:grid;grid-template-columns:1fr;gap:14px}
-@media (min-width:700px){.plans{grid-template-columns:repeat(3,1fr)}}
-@media (min-width:900px) and (max-width:1100px){body:not(.out) .plans{grid-template-columns:1fr}}
+@media (min-width:640px){.plans{grid-template-columns:1fr 1fr}}
 /* Comptes et accueil public */
 body.out .side, body.out .topbar, body.out .bottomnav{display:none}
 body.out .shell{grid-template-columns:1fr}
@@ -209,6 +208,13 @@ body.out main{padding-bottom:48px}
 .btn.danger-btn{background:var(--bad);color:var(--surface);border-color:var(--bad)}
 .btn.danger-outline{color:var(--bad);border-color:var(--bad)}
 .partners{display:grid;grid-template-columns:1fr;gap:12px}
+.quotes{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:640px){.quotes{grid-template-columns:1fr 1fr}}
+.swa{display:flex;flex-direction:column;gap:10px;background:var(--sunk);border-radius:12px;padding:14px 16px}
+.swa ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.swa li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.swa .k{color:var(--muted);min-width:76px}
+.swa .v{font-weight:600;user-select:all}
 @media (min-width:700px){.partners{grid-template-columns:1fr 1fr}}
 .partner{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface);min-width:0}
 .partner.chosen{border-color:var(--indigo);box-shadow:inset 0 0 0 1px var(--indigo)}
@@ -323,20 +329,24 @@ const CHECKS = [
 
 const PLANS = [
   {id:"decouverte", rank:0, name:"Découverte", price:"Gratuit", per:"", pitch:"Pour faire le point rapidement.",
-   feats:["Diagnostic rapide (2 questions par catégorie)","Rapport de diagnostic téléchargeable en PDF"]},
-  {id:"essentiel", rank:1, name:"Essentiel", price:"50 000", per:"FCFA / mois", pitch:"Pour sécuriser son entreprise en autonomie.",
-   feats:["Diagnostic complet, 7 catégories","Rapport de diagnostic en PDF","Plan d'action priorisé","Support Shield 24h/24 et 7j/7","Module conformité : registre, dossier APDP, modèles de documents"]},
-  {id:"premium", rank:2, name:"Premium", price:"100 000", per:"FCFA / mois", pitch:"Pour être accompagné sur place par un expert.",
-   feats:["Tout le plan Essentiel","Accompagnement sur place par un partenaire au choix : ISMACORP ou TEKNOFORCE"]}
+   feats:["Diagnostic complet : 25 questions, 7 catégories","Score et rapport de diagnostic téléchargeable en PDF"]},
+  {id:"essentiel", rank:1, name:"Essentiel", price:"50 000", per:"FCFA / mois", pitch:"Pour sécuriser son entreprise et se mettre en règle.",
+   feats:["Tout le plan Découverte","Plan d'action priorisé","Module conformité : registre, dossier APDP, modèles de documents","Support Shield 24h/24 et 7j/7","Demandes de devis auprès de SWA Tech ou de nos partenaires (diagnostic personnalisé, accompagnement sur place)"]}
 ];
 const PARTNERS = [
-  {id:"ismacorp", name:"ISMACORP", city:"Bamako", tagline:"Cybersécurité et conformité",
-   skills:["Supervision SOC (8/5 ou 24/7)","Audit de sécurité et tests d'intrusion","Accompagnement ISO 27001 et PCI DSS","Sécurité physique : contrôle d'accès, vidéosurveillance IP","Sensibilisation et formations en cybersécurité"],
-   best:["acces","postes","paie","web","sensi"]},
-  {id:"teknoforce", name:"TEKNOFORCE SARL", city:"Bamako", tagline:"Réseaux et infrastructures",
-   skills:["Audit, sécurisation et maintenance des réseaux (LAN, WAN, Wi-Fi, téléphonie IP)","Serveurs, virtualisation et data center","Archivage électronique et stockage sécurisé","Câblage et courant faible","Protection des données sensibles","Formation professionnelle"],
-   best:["reseau","sauv","postes"]}
+  {id:"ismacorp", name:"ISMACORP", city:"Bamako"},
+  {id:"teknoforce", name:"TEKNOFORCE SARL", city:"Bamako"}
 ];
+const SWA = {name:"SWA Tech", phone:"+33 6 88 78 26 28", email:"contact@swa-tech.fr", site:"https://www.swa-tech.fr/", siteLabel:"www.swa-tech.fr"};
+function swaBlock(intro){
+  return `<div class="swa">${intro ? `<p style="margin:0">${intro}</p>` : ""}
+    <ul>
+      <li><span class="k">Téléphone</span><span class="v num">${SWA.phone}</span><button class="btn small" data-act="copytxt" data-v="${SWA.phone}">Copier</button></li>
+      <li><span class="k">Email</span><span class="v">${SWA.email}</span><button class="btn small" data-act="copytxt" data-v="${SWA.email}">Copier</button></li>
+      <li><span class="k">Site web</span><a class="link" href="${SWA.site}" target="_blank" rel="noopener">${SWA.siteLabel}</a></li>
+    </ul></div>`;
+}
+const SWA_SENTENCE = "Pour un diagnostic plus complet et personnalisé pour votre entreprise, contactez SWA Tech. Le diagnostic personnalisé est réalisé sur devis.";
 
 /* ---------- État ---------- */
 const KEY = "shield-proto-v3", DEMO = "demo@shield.ml", DEMO_PW = "shield2026";
@@ -346,7 +356,7 @@ function newState(company){
 }
 function sampleState(){
   return {
-    sample:true, plan:"premium", partner:null, tickets:[], requests:[], tab:"tableau", diagView:"questions", diagCat:0, filter:"tout",
+    sample:true, plan:"essentiel", partner:null, tickets:[], requests:[], tab:"tableau", diagView:"questions", diagCat:0, filter:"tout",
     company:{name:"Kanté Distribution", city:"Bamako, ACI 2000", sector:"Commerce de gros", staff:"12", rccm:"MA.BKO.2021.B.XXXX", contact:"contact@kante-distribution.ml"},
     answers:{a1:"non",a2:"non",a3:"oui",a4:"nsp",b1:"oui",b2:"non",b3:"nsp",b4:"oui",c1:"oui",c2:"non",c3:"non",c4:"oui",d1:"oui",d2:"non",d3:"nsp",e1:"oui",e2:"oui",e3:"non",e4:"nsp",f1:"oui",f2:"non",f3:"non",g1:"non",g2:"non",g3:"nsp"},
     data:{clients:true, employes:true, cameras:true, whatsapp:true, paiement:true, sante:false},
@@ -373,7 +383,7 @@ const firstName = n => (n||"").trim().split(/\s+/)[0] || "";
 
 /* ---------- Calculs ---------- */
 const rank = () => PLANS.find(p => p.id === S.plan).rank;
-const availQs = c => rank() >= 1 ? c.qs : c.qs.slice(0,2);
+const availQs = c => c.qs;
 function catScore(c){ const qs = availQs(c); return Math.round(100 * qs.filter(q => S.answers[q.id]==="oui").length / qs.length); }
 function catAnswered(c){ return availQs(c).filter(q => S.answers[q.id]).length; }
 function cyberScore(){ return Math.round(CATS.reduce((s,c) => s + catScore(c), 0) / CATS.length); }
@@ -469,17 +479,19 @@ function renderTableau(){
       <div class="bars">${CATS.map(cat => { const v=catScore(cat); return `<div class="bar"><span class="lbl">${cat.name}</span><span class="val num">${v}</span><div class="track"><div class="fill f-${tone(v)}" style="width:${v}%"></div></div></div>`; }).join("")}</div>
     </div>
   </section>
-  <section class="card">
-    <div class="head"><div><h2>Plan d'action</h2><span class="muted" style="font-size:.86rem">${open.length} action${open.length>1?'s':''} à mener. Touchez un statut pour le faire avancer.</span></div>
-      <div class="filters" role="group" aria-label="Filtrer">${[["tout","Tout"],["cyber","Cyber"],["conf","Conformité"]].map(([k,l]) => `<button class="fbtn" data-act="filter" data-v="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join("")}</div></div>
-    ${rank()<1 && S.filter!=="conf" ? lockNote("Le plan d'action détaillé est inclus à partir du plan Essentiel.","Essentiel") : ""}
-    <ul class="actions">${(rank()<1 ? open.filter(a=>a.src!=="Cyber") : open).map(actionItem).join("") || '<li class="muted" style="padding:12px 0">Aucune action en attente.</li>'}</ul>
-    ${done.length ? `<button class="link" data-act="showdone">${UI.showDone?"Masquer":"Afficher"} les actions terminées (${done.length})</button>${UI.showDone?`<ul class="actions">${done.map(actionItem).join("")}</ul>`:""}` : ""}
-  </section>
+  ${rank()<1 ? `<section class="card"><h2>Plan d'action</h2>${lockNote("Le plan d'action priorisé, le module conformité, le support et les demandes de devis sont inclus dans l'abonnement Essentiel.","Essentiel")}</section>` : planSection(open, done)}
   ${partnerTeaser()}`;
 }
+function planSection(open, done){
+  return `<section class="card">
+    <div class="head"><div><h2>Plan d'action</h2><span class="muted" style="font-size:.86rem">${open.length} action${open.length>1?'s':''} à mener. Touchez un statut pour le faire avancer.</span></div>
+      <div class="filters" role="group" aria-label="Filtrer">${[["tout","Tout"],["cyber","Cyber"],["conf","Conformité"]].map(([k,l]) => `<button class="fbtn" data-act="filter" data-v="${k}" aria-pressed="${S.filter===k}">${l}</button>`).join("")}</div></div>
+    <ul class="actions">${open.map(actionItem).join("") || '<li class="muted" style="padding:12px 0">Aucune action en attente.</li>'}</ul>
+    ${done.length ? `<button class="link" data-act="showdone">${UI.showDone?"Masquer":"Afficher"} les actions terminées (${done.length})</button>${UI.showDone?`<ul class="actions">${done.map(actionItem).join("")}</ul>`:""}` : ""}
+  </section>`;
+}
 function welcome(){
-  const steps = [["Faire le diagnostic", rank()>=1 ? "25 questions, environ 15 minutes" : "14 questions, environ 5 minutes"],
+  const steps = [["Faire le diagnostic", "25 questions, environ 15 minutes"],
                  ["Suivre le plan d'action", "Les actions sont classées par urgence"],
                  ["Se mettre en conformité", "Registre, déclaration APDP, documents obligatoires"]];
   return `<section class="card"><span class="eyebrow">Bienvenue</span><h2>Bonjour ${esc(firstName(ME().name))}, commençons par évaluer votre entreprise</h2>
@@ -508,12 +520,13 @@ function renderDiagnostic(){
     </div></section>`;
 }
 function renderDiagIntro(answered, total){
-  const mins = rank() >= 1 ? "15" : "5";
+  const mins = "15";
   return `<div class="head"><div><span class="eyebrow">Module 1</span><h1>Diagnostic cyber</h1></div></div>
   <section class="card"><h2>${answered ? "Votre diagnostic est en cours" : "Évaluez la sécurité de votre entreprise"}</h2>
     <p style="max-width:65ch">${total} questions en 7 catégories, environ ${mins} minutes. Répondez par Oui, Non ou Je ne sais pas. À la fin, vous obtenez un score sur 100${rank() >= 1 ? ", un plan d'action priorisé" : ""} et un rapport à télécharger en PDF.</p>
     <div class="bars">${CATS.map(c => `<div class="bar"><span class="lbl">${c.name}</span><span class="val num muted">${catAnswered(c)}/${availQs(c).length}</span><div class="track"><div class="fill f-info" style="width:${Math.round(100*catAnswered(c)/availQs(c).length)}%"></div></div></div>`).join("")}</div>
     <p class="muted" style="font-size:.86rem">« Je ne sais pas » compte comme un risque. En cas de doute, demandez à la personne qui gère votre informatique.</p>
+    <p class="muted" style="font-size:.86rem">Besoin d'un diagnostic personnalisé ? Contactez SWA Tech au ${SWA.phone} ou à ${SWA.email} (sur devis).</p>
     <div class="row">${answered === total
       ? `<button class="btn primary" data-act="dview" data-v="rapport">Voir le rapport</button><button class="btn" data-act="startdiag">Revoir mes réponses</button>`
       : answered ? `<button class="btn primary" data-act="startdiag">Reprendre le diagnostic</button><button class="btn" data-act="dview" data-v="rapport">Voir le rapport</button>`
@@ -537,7 +550,9 @@ function renderRapport(){
   <section class="card"><h2>Plan d'action priorisé</h2>
     ${rank()<1 ? lockNote("Le plan d'action détaillé est inclus à partir du plan Essentiel.","Essentiel") :
       groups.map(([p,l]) => `<div class="prio-group"><span class="pill t-${PRIO[p].tone}" style="align-self:flex-start">${PRIO[p].label} · ${l.length}</span><ul class="actions">${l.map(actionItem).join("")}</ul></div>`).join("") || '<p class="muted">Aucune action ouverte. Bravo.</p>'}
-    </section>`;
+    </section>
+  <section class="card"><div class="head"><div><span class="eyebrow">Aller plus loin</span><h2>Diagnostic personnalisé</h2></div><span class="pill t-gold">Sur devis</span></div>
+    ${swaBlock(SWA_SENTENCE)}</section>`;
 }
 
 /* ---------- Rapport PDF ---------- */
@@ -639,6 +654,11 @@ async function downloadReport(){
       y += 2;
     });
 
+    // Diagnostic personnalisé
+    h2("Aller plus loin");
+    para(SWA_SENTENCE, 10);
+    para(`SWA Tech · ${SWA.phone} · ${SWA.email} · ${SWA.siteLabel}`, 10, "bold", C.indigo);
+
     // Pieds de page
     const n = doc.getNumberOfPages();
     for (let i = 1; i <= n; i++){
@@ -693,7 +713,7 @@ function renderConformite(){
     <dl class="form"><dt>Responsable du traitement</dt><dd>${esc(c.name)}</dd><dt>RCCM</dt><dd class="num">${esc(c.rccm)}</dd><dt>Adresse</dt><dd>${esc(c.city)}</dd><dt>Contact</dt><dd>${esc(c.contact)}</dd>
       <dt>Traitements déclarés</dt><dd>${rows.map(d=>d.tr).join(" ; ") || "Aucun"}</dd>
       <dt>Mesures de sécurité</dt><dd>${measures().join(" ; ")}</dd></dl>
-    ${r>=2 ? `<div class="row"><button class="btn" data-act="tab" data-v="assistance">Me faire accompagner par mon partenaire</button></div>` : lockNote("L'accompagnement sur place par un partenaire est inclus dans le plan Premium.","Premium")}
+    ${r>=1 ? `<div class="row"><button class="btn" data-act="tab" data-v="assistance">Demander un accompagnement (sur devis)</button></div>` : lockNote("Les demandes de devis sont accessibles avec l'abonnement Essentiel.","Essentiel")}
     <div class="row"><button class="btn ${S.checks.decl?'':'primary'}" data-act="check" data-v="decl">${S.checks.decl?"Déclaration déposée":"Marquer comme déposée"}</button></div>`)}
   ${step(4, tpls.filter(t=>t.k!=="clause").every(t=>S.checks[t.k]), r<1, "Documents obligatoires", r<1 ? lockNote("Les modèles de documents sont inclus dans le plan Essentiel.","Essentiel") : `
     <div class="tpls">${tpls.map(t=>`<div class="tpl"><div class="row"><h3>${t.t}</h3>${S.checks[t.k]?'<span class="pill t-good">En place</span>':''}</div><p class="muted" style="font-size:.85rem">${t.d}</p><div class="row"><button class="btn small" data-act="tpl" data-v="${t.k}">Ouvrir le modèle</button></div></div>`).join("")}</div>`)}
@@ -771,7 +791,7 @@ function openTpl(k){
 /* ---------- Plans ---------- */
 function renderPlans(){
   return `<div class="head"><div><span class="eyebrow">Abonnements</span><h1>Choisir un plan</h1></div></div>
-  <p class="muted" style="max-width:65ch">Payable par Orange Money ou Moov Money. Avec Premium, un partenaire de Shield au Mali (ISMACORP ou TEKNOFORCE) intervient dans vos locaux. Dans ce prototype, le paiement est simulé : aucun montant n'est débité.</p>
+  <p class="muted" style="max-width:65ch">Payable par Orange Money ou Moov Money. Avec l'abonnement Essentiel, vous pouvez demander des devis à SWA Tech ou à nos partenaires au Mali. Dans ce prototype, le paiement est simulé : aucun montant n'est débité.</p>
   <div class="plans">${PLANS.map(p => {
     const cur = p.id===S.plan;
     return `<article class="card plan ${cur?'current':''}">
@@ -780,10 +800,21 @@ function renderPlans(){
       <p class="muted" style="font-size:.88rem">${p.pitch}</p>
       <ul>${p.feats.map(f=>`<li>${f}</li>`).join("")}</ul>
       ${cur ? "" : UI.pay===p.id ? payPanel(p) : `<button class="btn ${p.rank>rank()?'primary':''}" data-act="choose" data-v="${p.id}">${p.id==="decouverte"?"Revenir au plan gratuit":"Choisir "+p.name}</button>`}
-    </article>`;}).join("")}</div>`;
+    </article>`;}).join("")}</div>
+  ${quoteServices()}`;
+}
+function quoteServices(){
+  return `<h2>Services sur devis</h2>
+  <div class="quotes">
+    <article class="card"><div class="head"><h3>Diagnostic personnalisé</h3><span class="pill t-gold">Sur devis</span></div>
+      <p class="muted" style="font-size:.88rem">Un diagnostic adapté à votre entreprise, réalisé par SWA Tech.</p></article>
+    <article class="card"><div class="head"><h3>Accompagnement sur place</h3><span class="pill t-gold">Sur devis</span></div>
+      <p class="muted" style="font-size:.88rem">Un partenaire de Shield au Mali (ISMACORP ou TEKNOFORCE) intervient dans vos locaux. La demande est envoyée à SWA Tech, qui organise l'intervention avec le partenaire.</p></article>
+  </div>
+  ${swaBlock("Pour un devis, contactez SWA Tech :")}`;
 }
 function payPanel(p){
-  return `<div class="pay">${p.id==="premium" ? `<div class="field"><label for="pay-partner">Partenaire pour l'accompagnement</label><select id="pay-partner">${PARTNERS.map(x=>`<option value="${x.id}" ${x.id===S.partner?"selected":""}>${x.name} · ${x.tagline}</option>`).join("")}</select></div>` : ""}
+  return `<div class="pay">${false ? `<div class="field"><label for="pay-partner">Partenaire souhaité pour l'accompagnement (sur devis)</label><select id="pay-partner">${PARTNERS.map(x=>`<option value="${x.id}" ${x.id===S.partner?"selected":""}>${x.name}</option>`).join("")}</select></div>` : ""}
     <div class="field"><label for="pay-op">Opérateur</label><select id="pay-op"><option>Orange Money</option><option>Moov Money</option></select></div>
     <div class="field"><label for="pay-num">Numéro de téléphone</label><input id="pay-num" inputmode="tel" placeholder="+223 7X XX XX XX"></div>
     <div class="row"><button class="btn primary" data-act="pay" data-v="${p.id}">Payer ${p.price} FCFA (simulation)</button><button class="btn" data-act="cancelpay">Annuler</button></div></div>`;
@@ -791,46 +822,45 @@ function payPanel(p){
 
 /* ---------- Assistance et partenaires ---------- */
 const fmtDate = v => v ? new Date(v + "T12:00:00").toLocaleDateString("fr-FR") : "dès que possible";
-function partnerNeed(p){ const cats = CATS.filter(c => p.best.includes(c.id)); return cats.reduce((s,c) => s + (100 - catScore(c)), 0) / cats.length; }
 function partnerTeaser(){
   const p = PARTNERS.find(x => x.id === S.partner);
-  const box = (title, body, btn) => `<section class="card"><div class="head"><div><span class="eyebrow">Accompagnement sur place</span><h2>${title}</h2></div>${btn}</div><p class="muted" style="font-size:.88rem">${body}</p></section>`;
-  if (rank() >= 2 && p){ const n = S.requests.filter(r => r.partner === p.id).length;
-    return box(p.name, `${n} demande${n>1?"s":""} d'intervention envoyée${n>1?"s":""}. Votre partenaire intervient dans vos locaux pour appliquer le plan d'action.`, `<button class="btn small" data-act="tab" data-v="assistance">${n ? "Suivre mes demandes" : "Demander une intervention"}</button>`); }
-  if (rank() >= 2) return box("Choisissez votre partenaire", "Votre plan Premium inclut l'intervention d'un expert partenaire dans vos locaux.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir</button>`);
-  return box("Un expert chez vous pour appliquer le plan", "Avec le plan Premium, ISMACORP ou TEKNOFORCE intervient dans vos locaux pour mettre en œuvre les actions.", `<button class="btn small" data-act="goplans">Voir Premium</button>`);
+  const box = (title, body, btn) => `<section class="card"><div class="head"><div><span class="eyebrow">Accompagnement sur place · sur devis</span><h2>${title}</h2></div>${btn}</div><p class="muted" style="font-size:.88rem">${body}</p></section>`;
+  if (rank() >= 1 && p){ const n = S.requests.filter(r => r.partner === p.id).length;
+    return box(p.name, `${n} demande${n>1?"s":""} envoyée${n>1?"s":""} à SWA Tech, qui organise l'intervention avec ${p.name} et vous adresse un devis.`, `<button class="btn small" data-act="tab" data-v="assistance">${n ? "Suivre mes demandes" : "Faire une demande"}</button>`); }
+  if (rank() >= 1) return box("Faites intervenir un expert chez vous", "Votre abonnement vous permet de demander l'accompagnement sur place d'un partenaire, sur devis. La demande passe par SWA Tech.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir un partenaire</button>`);
+  return box("Un expert chez vous pour appliquer le plan", "Avec l'abonnement Essentiel, ISMACORP ou TEKNOFORCE peut intervenir dans vos locaux, sur devis via SWA Tech.", `<button class="btn small" data-act="goplans">Voir l'abonnement</button>`);
 }
 function renderAssistance(){
   const r = rank();
-  const rec = [...PARTNERS].sort((a,b) => partnerNeed(b) - partnerNeed(a))[0].id;
-  const chosen = r >= 2 ? PARTNERS.find(p => p.id === S.partner) : null;
+  const chosen = r >= 1 ? PARTNERS.find(p => p.id === S.partner) : null;
   const support = r < 1 ? lockNote("Le support Shield 24h/24 et 7j/7 est inclus à partir du plan Essentiel.","Essentiel") : `
     <div class="field"><label for="sp-subj">Sujet</label><select id="sp-subj"><option>Incident en cours (piratage, fraude, vol)</option><option>Question sur mon diagnostic</option><option>Aide pour la conformité APDP</option><option>Autre demande</option></select></div>
     <div class="field"><label for="sp-msg">Votre message</label><textarea id="sp-msg" rows="3" placeholder="Décrivez la situation en quelques mots"></textarea></div>
     <div class="row"><button class="btn primary" data-act="ticket">Envoyer au support</button></div>
     ${S.tickets.length ? `<ul class="actions">${S.tickets.slice(-3).reverse().map(t => `<li class="action"><span class="stripe st-m3"></span><div class="body"><span class="title">${esc(t.subj)}</span><span class="muted" style="font-size:.8rem">${esc(t.date)} · ${esc(t.msg)}</span></div><span class="pill t-good">Reçu</span></li>`).join("")}</ul>` : ""}`;
-  const pcard = p => `<article class="partner ${chosen && chosen.id===p.id ? "chosen" : ""}">
-      <div class="head"><div><span class="eyebrow">${p.tagline} · ${p.city}</span><h3>${p.name}</h3></div>${p.id===rec ? '<span class="pill t-gold">Recommandé pour vos priorités</span>' : ""}</div>
-      <ul>${p.skills.map(s => `<li>${s}</li>`).join("")}</ul>
-      ${r < 2 ? "" : chosen && chosen.id===p.id ? '<span class="pill t-info" style="align-self:flex-start">Votre partenaire</span>'
-        : `<button class="btn small ${chosen ? "" : "primary"}" data-act="partner" data-v="${p.id}" style="align-self:flex-start">${chosen ? "Passer à ce partenaire" : "Choisir ce partenaire"}</button>`}
-    </article>`;
+  const pcard = p => {
+    const sel = chosen && chosen.id === p.id;
+    return `<article class="partner ${sel ? "chosen" : ""}">
+      <div class="head"><div><span class="eyebrow">Partenaire · ${p.city}</span><h3>${p.name}</h3></div>${sel ? '<span class="pill t-info">Sélectionné</span>' : ""}</div>
+      ${r >= 1 && !sel ? `<button class="btn small primary" data-act="partner" data-v="${p.id}" style="align-self:flex-start">Demander un accompagnement</button>` : ""}
+    </article>`; };
   const open = actions().filter(a => !a.done).slice(0, 8);
   const reqs = S.requests.slice().reverse();
   const request = !chosen ? "" : `
-  <section class="card"><h2>Demander une intervention à ${chosen.name}</h2>
-    <p class="muted" style="font-size:.88rem">Cochez les actions à réaliser sur place. Shield transmet votre diagnostic au partenaire, qui vous contacte pour fixer le rendez-vous.</p>
+  <section class="card"><h2>Demande d'accompagnement avec ${chosen.name}</h2>
+    <p class="muted" style="font-size:.88rem">Votre demande est envoyée à SWA Tech. SWA Tech vous adresse un devis, puis contacte ${chosen.name} pour organiser l'intervention dans vos locaux.</p>
     <div class="picklist">${open.map(a => `<label class="chip"><input type="checkbox" id="rq-${a.id}" value="${esc(a.title)}" ${a.p==="urgent" ? "checked" : ""}><span>${esc(a.title)}</span></label>`).join("") || '<p class="muted">Aucune action ouverte.</p>'}</div>
     <div class="field" style="max-width:240px"><label for="rq-date">Date souhaitée</label><input type="date" id="rq-date"></div>
     <div class="field"><label for="rq-note">Précisions (adresse, horaires, contact sur place)</label><textarea id="rq-note" rows="2"></textarea></div>
     <div class="row"><button class="btn primary" data-act="request">Envoyer la demande</button></div>
-    ${reqs.length ? `<h3>Mes demandes</h3><ul class="actions">${reqs.map(q => `<li class="action"><span class="stripe st-m1"></span><div class="body"><span class="title">${q.n} action${q.n>1?"s":""} · ${esc(q.partnerName)}</span><span class="muted" style="font-size:.8rem">Envoyée le ${esc(q.sent)} · souhaitée ${q.date.startsWith("dès") ? "" : "le "}${esc(q.date)}</span></div><span class="pill t-warn">À planifier</span></li>`).join("")}</ul>` : ""}
+    ${reqs.length ? `<h3>Mes demandes</h3><ul class="actions">${reqs.map(q => `<li class="action"><span class="stripe st-m1"></span><div class="body"><span class="title">${q.n} action${q.n>1?"s":""} · ${esc(q.partnerName)}</span><span class="muted" style="font-size:.8rem">Transmise à SWA Tech le ${esc(q.sent)} · souhaitée ${q.date.startsWith("dès") ? "" : "le "}${esc(q.date)}</span></div><span class="pill t-warn">Devis en attente</span></li>`).join("")}</ul>` : ""}
   </section>`;
   return `
   <div class="head"><div><span class="eyebrow">Aide et experts</span><h1>Assistance</h1></div></div>
   <section class="card"><div class="head"><div><h2>Support Shield</h2><span class="muted" style="font-size:.86rem">24h/24 et 7j/7, par message ou par téléphone</span></div>${r >= 1 ? '<span class="pill t-good">Inclus dans votre plan</span>' : ""}</div>${support}</section>
-  <section class="card"><div class="head"><div><h2>Accompagnement sur place</h2><span class="muted" style="font-size:.86rem">Nos partenaires au Mali interviennent dans vos locaux.${r >= 2 ? " La recommandation tient compte de vos catégories les plus faibles." : ""}</span></div>${r >= 2 ? '<span class="pill t-good">Inclus dans Premium</span>' : ""}</div>
-    ${r < 2 ? lockNote("L'accompagnement sur place par un partenaire est inclus dans le plan Premium.","Premium") : ""}
+  <section class="card"><div class="head"><div><h2>Diagnostic personnalisé</h2></div><span class="pill t-gold">Sur devis</span></div>${swaBlock(SWA_SENTENCE)}</section>
+  <section class="card"><div class="head"><div><h2>Accompagnement sur place</h2><span class="muted" style="font-size:.86rem">Nos partenaires au Mali interviennent dans vos locaux, sur devis.</span></div><span class="pill t-gold">Sur devis</span></div>
+    ${r < 1 ? lockNote("Les demandes de devis sont accessibles avec l'abonnement Essentiel.","Essentiel") : ""}
     <div class="partners">${PARTNERS.map(pcard).join("")}</div></section>
   ${request}`;
 }
@@ -841,7 +871,7 @@ const authMsg = () => UI.authMsg ? `<p class="${UI.authMsg.t}" role="alert">${es
 function renderLanding(){
   const feats = [["Diagnostic en 7 catégories","Accès, sauvegardes, postes, Wi-Fi, Mobile Money, site web et personnel."],
                  ["Conformité APDP","Registre des traitements, dossier de déclaration, politique de confidentialité."],
-                 ["Experts sur place","ISMACORP et TEKNOFORCE accompagnent les clients Premium au Mali."]];
+                 ["Experts sur place","SWA Tech, ISMACORP et TEKNOFORCE interviennent dans vos locaux, sur devis."]];
   return `<div class="landing">
     <div class="row" style="justify-content:space-between"><div class="brand big">${LOGO}Shield</div><button class="btn" data-act="auth" data-v="login">Se connecter</button></div>
     <div class="strip" aria-hidden="true"></div>
@@ -851,6 +881,7 @@ function renderLanding(){
     <div class="feats">${feats.map(([t,d]) => `<div class="feat"><h3>${t}</h3><p class="muted">${d}</p></div>`).join("")}</div>
     <h2>Nos offres</h2>
     <div class="plans">${PLANS.map(p => `<article class="card plan"><h2>${p.name}</h2><div class="price">${p.price} <small>${p.per}</small></div><p class="muted" style="font-size:.88rem">${p.pitch}</p><ul>${p.feats.map(f => `<li>${f}</li>`).join("")}</ul><button class="btn ${p.id==="essentiel" ? "primary" : ""}" data-act="auth" data-v="signup" data-plan="${p.id}" style="margin-top:auto">Commencer</button></article>`).join("")}</div>
+    ${quoteServices()}
   </div>`;
 }
 function renderLogin(){
@@ -935,7 +966,7 @@ function migrate(st){
 function renderCompte(){
   const me = ME(), c = S.company, p = PLANS.find(x => x.id === S.plan);
   const f = (id, l, v, type="text", extra="") => `<div class="field"><label for="ac-${id}">${l}</label><input id="ac-${id}" type="${type}" value="${esc(v)}" ${extra}></div>`;
-  const partner = S.plan === "premium" && S.partner ? PARTNERS.find(x => x.id === S.partner) : null;
+  const partner = S.plan !== "decouverte" && S.partner ? PARTNERS.find(x => x.id === S.partner) : null;
   return `<div class="head"><div><span class="eyebrow">Paramètres</span><h1>Mon compte</h1></div><button class="btn" data-act="logout">Se déconnecter</button></div>
   <div class="grid2">
     <section class="card"><h2>Mes informations</h2>${f("name","Nom et prénom",me.name,"text",'autocomplete="name"')}${f("email","Email",me.email,"email","readonly")}${f("phone","Téléphone",me.phone,"tel",'autocomplete="tel"')}
@@ -1058,19 +1089,22 @@ document.addEventListener("click", e => {
       if (!msg){ toast("Écrivez votre message avant de l'envoyer."); $("sp-msg").focus(); break; }
       S.tickets.push({subj:$("sp-subj").value, msg, date:new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})});
       save(); render(); toast("Message envoyé au support Shield (simulation)."); break; }
-    case "partner": S.partner = v; save(); render(); toast(`${PARTNERS.find(p=>p.id===v).name} est votre partenaire.`); break;
+    case "partner": S.partner = v; save(); render(); toast(`${PARTNERS.find(p=>p.id===v).name} sélectionné. Complétez votre demande.`); break;
+    case "copytxt": {
+      const done = () => toast("Copié.");
+      try { navigator.clipboard.writeText(v).then(done, () => toast(v)); } catch(err){ toast(v); }
+      break; }
     case "request": {
       const picked = [...document.querySelectorAll(".picklist input:checked")];
       if (!picked.length){ toast("Cochez au moins une action à réaliser sur place."); break; }
       const p = PARTNERS.find(x => x.id === S.partner);
       S.requests.push({partner:p.id, partnerName:p.name, n:picked.length, actions:picked.map(i=>i.value), date:fmtDate($("rq-date").value), note:$("rq-note").value.trim(), sent:new Date().toLocaleDateString("fr-FR")});
-      save(); render(); toast(`Demande envoyée à ${p.name} (simulation).`); break; }
+      save(); render(); toast("Demande envoyée à SWA Tech (simulation)."); break; }
     case "choose": if (v==="decouverte"){ S.plan=v; save(); render(); toast("Plan Découverte activé."); } else { UI.pay=v; render(); } break;
     case "cancelpay": UI.pay=null; render(); break;
     case "pay": {
       const num = ($("pay-num").value||"").replace(/\s/g,"");
       if (num.replace(/\D/g,"").length < 8){ toast("Saisissez un numéro de téléphone valide (8 chiffres au moins)."); $("pay-num").focus(); break; }
-      if (v === "premium") S.partner = $("pay-partner").value;
       S.plan = v; UI.pay=null; save(); render(); toast(`Plan ${planName()} activé (paiement simulé).`); break; }
     case "profile": openProfile(); break;
     case "saveprofile": {
