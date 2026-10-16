@@ -827,8 +827,8 @@ function partnerTeaser(){
   const box = (title, body, btn) => `<section class="card"><div class="head"><div><span class="eyebrow">Accompagnement sur place · sur devis</span><h2>${title}</h2></div>${btn}</div><p class="muted" style="font-size:.88rem">${body}</p></section>`;
   if (rank() >= 1 && p){ const n = S.requests.filter(r => r.partner === p.id).length;
     return box(p.name, `${n} demande${n>1?"s":""} envoyée${n>1?"s":""} à SWA Tech, qui organise l'intervention avec ${p.name} et vous adresse un devis.`, `<button class="btn small" data-act="tab" data-v="assistance">${n ? "Suivre mes demandes" : "Faire une demande"}</button>`); }
-  if (rank() >= 1) return box("Faites intervenir un expert chez vous", "Votre abonnement vous permet de demander l'accompagnement sur place d'un partenaire, sur devis. La demande passe par SWA Tech.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir un partenaire</button>`);
-  return box("Un expert chez vous pour appliquer le plan", "Avec l'abonnement Essentiel, ISMACORP ou TEKNOFORCE peut intervenir dans vos locaux, sur devis via SWA Tech.", `<button class="btn small" data-act="goplans">Voir l'abonnement</button>`);
+  if (rank() >= 1) return box("Faites intervenir un expert chez vous", "Votre abonnement vous permet de demander l'accompagnement sur place, sur devis.", `<button class="btn small primary" data-act="tab" data-v="assistance">Choisir un partenaire</button>`);
+  return box("Un expert chez vous pour appliquer le plan", "Avec l'abonnement Essentiel.", `<button class="btn small" data-act="goplans">Voir l'abonnement</button>`);
 }
 function renderAssistance(){
   const r = rank();
@@ -871,7 +871,7 @@ const authMsg = () => UI.authMsg ? `<p class="${UI.authMsg.t}" role="alert">${es
 function renderLanding(){
   const feats = [["Diagnostic en 7 catégories","Accès, sauvegardes, postes, Wi-Fi, Mobile Money, site web et personnel."],
                  ["Conformité APDP","Registre des traitements, dossier de déclaration, politique de confidentialité."],
-                 ["Experts sur place","SWA Tech, ISMACORP et TEKNOFORCE interviennent dans vos locaux, sur devis."]];
+                 ["Experts sur place", sur devis."]];
   return `<div class="landing">
     <div class="row" style="justify-content:space-between"><div class="brand big">${LOGO}Shield</div><button class="btn" data-act="auth" data-v="login">Se connecter</button></div>
     <div class="strip" aria-hidden="true"></div>
